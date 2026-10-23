@@ -1,0 +1,2291 @@
+{
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "generated_by": "scripts/build_changes.py",
+ "groups": {
+  "pandas": {
+   "removed": {
+    "read_gbq": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Please use ``pandas_gbq.read_gbq`` instead."
+      }
+     ]
+    },
+    "value_counts": {}
+   },
+   "removed_params": {
+    "Categorical": {
+     "params": [
+      "fastpath"
+     ]
+    },
+    "DatetimeIndex": {
+     "params": [
+      "normalize",
+      "closed"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:normalize",
+       "note": ""
+      },
+      {
+       "version": "2.1.0",
+       "target": "parameter:closed",
+       "note": ""
+      }
+     ]
+    },
+    "MultiIndex": {
+     "params": [
+      "dtype"
+     ]
+    },
+    "PeriodIndex": {
+     "params": [
+      "ordinal",
+      "fields"
+     ]
+    },
+    "Series": {
+     "params": [
+      "fastpath"
+     ]
+    },
+    "TimedeltaIndex": {
+     "params": [
+      "unit",
+      "closed"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:unit",
+       "note": "Use ``pd.to_timedelta`` instead."
+      }
+     ]
+    },
+    "describe_option": {
+     "params": [
+      "args",
+      "kwds"
+     ]
+    },
+    "get_option": {
+     "params": [
+      "args",
+      "kwds"
+     ]
+    },
+    "read_csv": {
+     "params": [
+      "verbose",
+      "infer_datetime_format",
+      "keep_date_col",
+      "date_parser",
+      "delim_whitespace"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:verbose",
+       "note": ""
+      },
+      {
+       "version": "2.0.0",
+       "target": "parameter:infer_datetime_format",
+       "note": "A strict version of this argument is now the default, passing it has no effect."
+      },
+      {
+       "version": "2.0.0",
+       "target": "parameter:date_parser",
+       "note": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:delim_whitespace",
+       "note": "Use ``sep=\"\\s+\"`` instead."
+      }
+     ]
+    },
+    "read_excel": {
+     "params": [
+      "date_parser"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "parameter:date_parser",
+       "note": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`to_datetime` as-needed."
+      }
+     ]
+    },
+    "read_fwf": {
+     "params": [
+      "dtype_backend"
+     ]
+    },
+    "read_parquet": {
+     "params": [
+      "use_nullable_dtypes"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.0",
+       "target": "parameter:use_nullable_dtypes",
+       "note": ""
+      }
+     ]
+    },
+    "read_table": {
+     "params": [
+      "verbose",
+      "infer_datetime_format",
+      "keep_date_col",
+      "date_parser",
+      "delim_whitespace"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:verbose",
+       "note": ""
+      },
+      {
+       "version": "2.0.0",
+       "target": "parameter:infer_datetime_format",
+       "note": "A strict version of this argument is now the default, passing it has no effect."
+      },
+      {
+       "version": "2.0.0",
+       "target": "parameter:date_parser",
+       "note": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:delim_whitespace",
+       "note": "Use ``sep=\"\\s+\"`` instead."
+      }
+     ]
+    },
+    "reset_option": {
+     "params": [
+      "args",
+      "kwds"
+     ]
+    },
+    "set_option": {
+     "params": [
+      "kwds"
+     ]
+    },
+    "to_datetime": {
+     "params": [
+      "infer_datetime_format"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "parameter:infer_datetime_format",
+       "note": "A strict version of this argument is now the default, passing it has no effect."
+      }
+     ]
+    }
+   },
+   "added": [
+    "NamedFunc",
+    "col",
+    "read_iceberg"
+   ],
+   "deprecated": {
+    "DatetimeIndex": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:ambiguous",
+      "note": "Use :meth:`DatetimeIndex.tz_localize` instead."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:dayfirst",
+      "note": "Use :func:`to_datetime` instead."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:yearfirst",
+      "note": "Use :func:`to_datetime` instead."
+     }
+    ],
+    "ExcelFile": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:engine",
+      "note": "For xlsx/xlsm files the default engine will change from ``openpyxl`` to ``calamine`` in a future version. Pass ``engine`` explicitly, or set the ``io.excel.xlsx.reader`` option (xlsm files are format-detected as xlsx), to keep the current behavior."
+     }
+    ],
+    "Timedelta": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:unit",
+      "note": "Allowing the values `w`, `d`, `MIN`, `MS`, `US` and `NS` to denote units are deprecated in favour of the values `W`, `D`, `min`, `ms`, `us` and `ns`."
+     }
+    ],
+    "concat": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "eval": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "infer_freq": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "A future version of pandas will return a :class:`BaseOffset` instead of a string. Use ``pd.set_option('future.infer_freq_returns_offset', True)`` to opt in to the future behavior."
+     }
+    ],
+    "merge": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "read_csv": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:float_precision",
+      "note": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     }
+    ],
+    "read_excel": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:engine",
+      "note": "For xlsx/xlsm files the default engine will change from ``openpyxl`` to ``calamine`` in a future version. Pass ``engine`` explicitly, or set the ``io.excel.xlsx.reader`` option (xlsm files are format-detected as xlsx), to keep the current behavior."
+     }
+    ],
+    "read_json": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_dates",
+      "note": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:keep_default_dates",
+      "note": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     }
+    ],
+    "read_parquet": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:engine",
+      "note": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "read_sas": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:encoding",
+      "note": "The default will change from ``None`` to ``'infer'``, so text data will be decoded rather than returned as bytes.  Pass ``None`` explicitly to keep the current behavior."
+     }
+    ],
+    "read_table": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:float_precision",
+      "note": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     }
+    ],
+    "set_eng_float_format": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use ``pd.set_option(\"display.precision\", N)`` to control decimal precision, or pass a custom callable to ``pd.set_option(\"display.float_format\", func)``."
+     }
+    ],
+    "to_datetime": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:format",
+      "note": "Passing integer or float values together with ``format`` is deprecated; cast them to strings first. In a future version numeric values will be interpreted as epochs via ``unit`` instead, and ``format`` will only apply to string input."
+     }
+    ]
+   }
+  },
+  "DataFrame": {
+   "removed": {
+    "applymap": {
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "DataFrame.applymap has been deprecated. Use DataFrame.map instead."
+      }
+     ]
+    },
+    "backfill": {
+     "was_deprecated": [
+      {
+       "version": "2.0",
+       "target": "member",
+       "note": "Series/DataFrame.backfill is deprecated. Use Series/DataFrame.bfill instead."
+      }
+     ]
+    },
+    "bool": {
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "bool is deprecated and will be removed in future version of pandas. For ``Series`` use ``pandas.Series.item``."
+      }
+     ]
+    },
+    "first": {
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "member",
+       "note": ":meth:`.first` is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead."
+      }
+     ]
+    },
+    "last": {
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "member",
+       "note": ":meth:`.last` is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead."
+      },
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "Please create a mask and filter using `.loc` instead"
+      }
+     ]
+    },
+    "pad": {
+     "was_deprecated": [
+      {
+       "version": "2.0",
+       "target": "member",
+       "note": "Series/DataFrame.pad is deprecated. Use Series/DataFrame.ffill instead."
+      }
+     ]
+    },
+    "swapaxes": {
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "``swapaxes`` is deprecated and will be removed. Please use ``transpose`` instead."
+      }
+     ]
+    },
+    "to_gbq": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Please use ``pandas_gbq.to_gbq`` instead."
+      }
+     ]
+    }
+   },
+   "removed_params": {
+    "align": {
+     "params": [
+      "method",
+      "limit",
+      "fill_axis",
+      "broadcast_axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "parameter:method",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:limit",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:fill_axis",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:broadcast_axis",
+       "note": ""
+      }
+     ]
+    },
+    "bfill": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "ewm": {
+     "params": [
+      "axis"
+     ]
+    },
+    "expanding": {
+     "params": [
+      "axis"
+     ]
+    },
+    "ffill": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "fillna": {
+     "params": [
+      "method",
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:method",
+       "note": "Use ffill or bfill instead."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "groupby": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "Will be removed and behave like axis=0 in a future version. For ``axis=1``, do ``frame.T.groupby(...)`` instead."
+      }
+     ]
+    },
+    "interpolate": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "pct_change": {
+     "params": [
+      "limit"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "parameter:limit",
+       "note": ""
+      }
+     ]
+    },
+    "query": {
+     "params": [
+      "kwargs"
+     ]
+    },
+    "replace": {
+     "params": [
+      "limit",
+      "method"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:limit",
+       "note": ""
+      },
+      {
+       "version": "2.1.0",
+       "target": "parameter:method",
+       "note": ""
+      }
+     ]
+    },
+    "resample": {
+     "params": [
+      "axis",
+      "kind"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "parameter:axis",
+       "note": "Use frame.T.resample(...) instead."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:kind",
+       "note": "Convert index to desired type explicitly instead."
+      }
+     ]
+    },
+    "rolling": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "The axis keyword is deprecated. For ``axis=1``, transpose the DataFrame first instead."
+      }
+     ]
+    }
+   },
+   "added": [
+    "from_arrow",
+    "select",
+    "to_iceberg"
+   ],
+   "deprecated": {
+    "align": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "astype": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "convert_dtypes": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:infer_objects",
+      "note": "The ``infer_objects`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_string",
+      "note": "The ``convert_string`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_integer",
+      "note": "The ``convert_integer`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_boolean",
+      "note": "The ``convert_boolean`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_floating",
+      "note": "The ``convert_floating`` keyword is deprecated and will be removed in a future version."
+     }
+    ],
+    "drop": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "drop_duplicates": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "dropna": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "eval": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "from_dict": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:data",
+      "note": "Passing a non-dict to ``from_dict`` is deprecated. Use the :class:`DataFrame` constructor instead."
+     }
+    ],
+    "from_records": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:data",
+      "note": "Passing a dict is deprecated. Use the DataFrame constructor or :meth:`DataFrame.from_dict` instead."
+     }
+    ],
+    "infer_objects": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "join": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:lsuffix",
+      "note": "Use ``suffixes`` instead."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:rsuffix",
+      "note": "Use ``suffixes`` instead."
+     }
+    ],
+    "merge": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "query": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "reindex": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "reindex_like": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:method",
+      "note": ""
+     },
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "rename": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "rename_axis": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "reset_index": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "set_axis": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "set_flags": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "set_index": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     },
+     {
+      "version": "3.0.0",
+      "target": "parameter:verify_integrity",
+      "note": "The ``verify_integrity`` keyword is deprecated and will be removed in a future version. Check ``result.index.is_unique`` directly instead."
+     }
+    ],
+    "sort_index": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "sort_values": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "stack": [
+     {
+      "version": "3.0",
+      "target": "parameter:dropna",
+      "note": "This parameter is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.0",
+      "target": "parameter:sort",
+      "note": "This parameter is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.0",
+      "target": "parameter:future_stack",
+      "note": "This parameter is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "to_hdf": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:dropna",
+      "note": "The ``dropna`` keyword is deprecated and will be removed in a future version. Use :meth:`DataFrame.dropna` before writing instead."
+     }
+    ],
+    "to_json": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:date_format",
+      "note": "'epoch' date format is deprecated and will be removed in a future version, please use 'iso' instead."
+     }
+    ],
+    "to_parquet": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:engine",
+      "note": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "to_period": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "to_timestamp": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "transpose": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "truncate": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "tz_convert": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "tz_localize": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ]
+   }
+  },
+  "Series": {
+   "removed": {
+    "backfill": {
+     "was_deprecated": [
+      {
+       "version": "2.0",
+       "target": "member",
+       "note": "Series/DataFrame.backfill is deprecated. Use Series/DataFrame.bfill instead."
+      }
+     ]
+    },
+    "bool": {
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "bool is deprecated and will be removed in future version of pandas. For ``Series`` use ``pandas.Series.item``."
+      }
+     ]
+    },
+    "first": {
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "member",
+       "note": ":meth:`.first` is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead."
+      }
+     ]
+    },
+    "last": {
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "member",
+       "note": ":meth:`.last` is deprecated and will be removed in a future version. Please create a mask and filter using `.loc` instead."
+      },
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "Please create a mask and filter using `.loc` instead"
+      }
+     ]
+    },
+    "pad": {
+     "was_deprecated": [
+      {
+       "version": "2.0",
+       "target": "member",
+       "note": "Series/DataFrame.pad is deprecated. Use Series/DataFrame.ffill instead."
+      }
+     ]
+    },
+    "ravel": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Series.ravel is deprecated. The underlying array is already 1D, so ravel is not necessary.  Use :meth:`to_numpy` for conversion to a numpy array instead."
+      }
+     ]
+    },
+    "swapaxes": {
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "``swapaxes`` is deprecated and will be removed. Please use ``transpose`` instead."
+      }
+     ]
+    },
+    "view": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "``Series.view`` is deprecated and will be removed in a future version. Use :meth:`Series.astype` as an alternative to change the dtype."
+      }
+     ]
+    }
+   },
+   "removed_params": {
+    "align": {
+     "params": [
+      "method",
+      "limit",
+      "fill_axis",
+      "broadcast_axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "parameter:method",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:limit",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:fill_axis",
+       "note": ""
+      },
+      {
+       "version": "2.1",
+       "target": "parameter:broadcast_axis",
+       "note": ""
+      }
+     ]
+    },
+    "apply": {
+     "params": [
+      "convert_dtype"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:convert_dtype",
+       "note": "``convert_dtype`` has been deprecated. Do ``ser.astype(object).apply()`` instead if you want ``convert_dtype=False``."
+      }
+     ]
+    },
+    "bfill": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "ewm": {
+     "params": [
+      "axis"
+     ]
+    },
+    "expanding": {
+     "params": [
+      "axis"
+     ]
+    },
+    "ffill": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "fillna": {
+     "params": [
+      "method",
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:method",
+       "note": "Use ffill or bfill instead."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "groupby": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "Will be removed and behave like axis=0 in a future version. For ``axis=1``, do ``frame.T.groupby(...)`` instead."
+      }
+     ]
+    },
+    "interpolate": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "map": {
+     "params": [
+      "arg"
+     ]
+    },
+    "pct_change": {
+     "params": [
+      "limit"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1",
+       "target": "parameter:limit",
+       "note": ""
+      }
+     ]
+    },
+    "replace": {
+     "params": [
+      "limit",
+      "method"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:limit",
+       "note": ""
+      },
+      {
+       "version": "2.1.0",
+       "target": "parameter:method",
+       "note": ""
+      }
+     ]
+    },
+    "resample": {
+     "params": [
+      "axis",
+      "kind"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "parameter:axis",
+       "note": "Use frame.T.resample(...) instead."
+      },
+      {
+       "version": "2.2.0",
+       "target": "parameter:kind",
+       "note": "Convert index to desired type explicitly instead."
+      }
+     ]
+    },
+    "rolling": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "The axis keyword is deprecated. For ``axis=1``, transpose the DataFrame first instead."
+      }
+     ]
+    }
+   },
+   "added": [
+    "from_arrow"
+   ],
+   "deprecated": {
+    "align": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "astype": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "convert_dtypes": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:infer_objects",
+      "note": "The ``infer_objects`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_string",
+      "note": "The ``convert_string`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_integer",
+      "note": "The ``convert_integer`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_boolean",
+      "note": "The ``convert_boolean`` keyword is deprecated and will be removed in a future version."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:convert_floating",
+      "note": "The ``convert_floating`` keyword is deprecated and will be removed in a future version."
+     }
+    ],
+    "drop": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "drop_duplicates": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "dropna": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "infer_objects": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "reindex": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "reindex_like": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:method",
+      "note": ""
+     },
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "rename": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "rename_axis": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "reset_index": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "set_axis": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "set_flags": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "sort_index": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "sort_values": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:inplace",
+      "note": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8 <https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace>`__ for more details."
+     }
+    ],
+    "swaplevel": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "to_hdf": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:dropna",
+      "note": "The ``dropna`` keyword is deprecated and will be removed in a future version. Use :meth:`DataFrame.dropna` before writing instead."
+     }
+    ],
+    "to_json": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:date_format",
+      "note": "'epoch' date format is deprecated and will be removed in a future version, please use 'iso' instead."
+     }
+    ],
+    "to_period": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "to_timestamp": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "truncate": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "tz_convert": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "tz_localize": [
+     {
+      "version": "3.0.0",
+      "target": "parameter:copy",
+      "note": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write). See the `user guide on Copy-on-Write <https://pandas.pydata.org/docs/dev/user_guide/migration.html>`__ for more details."
+     }
+    ],
+    "values": [
+     {
+      "version": "3.0.0",
+      "target": "member",
+      "note": "For :class:`DatetimeTZDtype`, :class:`PeriodDtype`, and :class:`IntervalDtype` dtypes, the behavior of ``.values`` returning a lossy or object-dtype result is deprecated. In a future version, ``.values`` will return the underlying ExtensionArray. Use :meth:`Series.to_numpy` or :attr:`Series.array` instead."
+     }
+    ]
+   }
+  },
+  "Index": {
+   "removed": {
+    "format": {},
+    "holds_integer": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.infer_dtype` instead"
+      }
+     ]
+    },
+    "is_boolean": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.is_bool_dtype` instead."
+      }
+     ]
+    },
+    "is_categorical": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `isinstance(index.dtype, pd.CategoricalDtype)` instead."
+      }
+     ]
+    },
+    "is_floating": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.is_float_dtype` instead"
+      }
+     ]
+    },
+    "is_integer": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.is_integer_dtype` instead."
+      }
+     ]
+    },
+    "is_interval": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `isinstance(index.dtype, pd.IntervalDtype)` instead."
+      }
+     ]
+    },
+    "is_numeric": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.is_numeric_dtype` instead."
+      }
+     ]
+    },
+    "is_object": {
+     "was_deprecated": [
+      {
+       "version": "2.0.0",
+       "target": "member",
+       "note": "Use `pandas.api.types.is_object_dtype` instead."
+      }
+     ]
+    },
+    "sort": {}
+   },
+   "removed_params": {
+    "fillna": {
+     "params": [
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    }
+   },
+   "added": [
+    "replace"
+   ],
+   "deprecated": {}
+  },
+  "DataFrameGroupBy": {
+   "removed": {
+    "dtypes": {},
+    "fillna": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "This method is deprecated and will be removed in a future version. Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+      }
+     ]
+    },
+    "grouper": {}
+   },
+   "removed_params": {
+    "corrwith": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cummax": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cummin": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cumprod": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cumsum": {
+     "params": [
+      "axis"
+     ]
+    },
+    "diff": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "ewm": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "expanding": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "get_group": {
+     "params": [
+      "obj"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:obj",
+       "note": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+      }
+     ]
+    },
+    "idxmax": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "idxmin": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "pct_change": {
+     "params": [
+      "limit",
+      "axis"
+     ]
+    },
+    "rank": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "resample": {
+     "params": [
+      "args"
+     ]
+    },
+    "rolling": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "shift": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "skew": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "take": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    }
+   },
+   "added": [
+    "kurt"
+   ],
+   "deprecated": {
+    "corrwith": [
+     {
+      "version": "3.0.0",
+      "target": "member",
+      "note": ""
+     }
+    ],
+    "cummax": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cummax is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cummin": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cummin is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cumprod": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:args",
+      "note": "Passing ``*args`` to GroupBy.cumprod is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cumprod is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cumsum": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:args",
+      "note": "Passing ``*args`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "nth": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     }
+    ],
+    "skew": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:numeric_only",
+      "note": "Passing ``**kwargs`` to DataFrameGroupBy.skew is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "take": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:indices",
+      "note": "Passing ``**kwargs`` to DataFrameGroupBy.take is deprecated and will be removed in a future version of pandas."
+     }
+    ]
+   }
+  },
+  "SeriesGroupBy": {
+   "removed": {
+    "fillna": {
+     "was_deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "This method is deprecated and will be removed in a future version. Use the :meth:`.SeriesGroupBy.ffill` or :meth:`.SeriesGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`Series.fillna` instead."
+      }
+     ]
+    },
+    "grouper": {}
+   },
+   "removed_params": {
+    "cummax": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cummin": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cumprod": {
+     "params": [
+      "axis"
+     ]
+    },
+    "cumsum": {
+     "params": [
+      "axis"
+     ]
+    },
+    "diff": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "ewm": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "expanding": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "get_group": {
+     "params": [
+      "obj"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:obj",
+       "note": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+      }
+     ]
+    },
+    "idxmax": {
+     "params": [
+      "axis"
+     ]
+    },
+    "idxmin": {
+     "params": [
+      "axis"
+     ]
+    },
+    "pct_change": {
+     "params": [
+      "limit",
+      "axis"
+     ]
+    },
+    "rank": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "resample": {
+     "params": [
+      "args"
+     ]
+    },
+    "rolling": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "shift": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "skew": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    },
+    "take": {
+     "params": [
+      "axis"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:axis",
+       "note": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+      }
+     ]
+    }
+   },
+   "added": [
+    "kurt"
+   ],
+   "deprecated": {
+    "cummax": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cummax is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cummin": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cummin is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cumprod": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:args",
+      "note": "Passing ``*args`` to GroupBy.cumprod is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cumprod is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "cumsum": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:args",
+      "note": "Passing ``*args`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "version": "3.1.0",
+      "target": "parameter:kwargs",
+      "note": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "nth": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     }
+    ],
+    "skew": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:numeric_only",
+      "note": "Passing ``**kwargs`` to SeriesGroupBy.skew is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "take": [
+     {
+      "version": "3.1.0",
+      "target": "parameter:indices",
+      "note": "Passing ``**kwargs`` to SeriesGroupBy.take is deprecated and will be removed in a future version of pandas."
+     }
+    ]
+   }
+  },
+  "Resampler": {
+   "removed": {
+    "fillna": {},
+    "grouper": {}
+   },
+   "removed_params": {
+    "first": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "get_group": {
+     "params": [
+      "obj"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:obj",
+       "note": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+      }
+     ]
+    },
+    "interpolate": {
+     "params": [
+      "inplace",
+      "downcast"
+     ],
+     "was_deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "parameter:downcast",
+       "note": ""
+      }
+     ]
+    },
+    "last": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "max": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "mean": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "median": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "min": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "nunique": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "ohlc": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "prod": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "sem": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "std": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "sum": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "var": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    }
+   },
+   "added": [],
+   "deprecated": {}
+  },
+  "Series.str": {
+   "removed": {},
+   "removed_params": {
+    "wrap": {
+     "params": [
+      "kwargs"
+     ]
+    }
+   },
+   "added": [
+    "isascii"
+   ],
+   "deprecated": {}
+  },
+  "Series.dt (datetime)": {
+   "removed": {},
+   "removed_params": {
+    "as_unit": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "ceil": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "day_name": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "floor": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "month_name": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "normalize": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "round": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "strftime": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "to_period": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "tz_convert": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "tz_localize": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    }
+   },
+   "added": [],
+   "deprecated": {
+    "dayofweek": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_week` instead."
+     }
+    ],
+    "dayofyear": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_year` instead."
+     }
+    ],
+    "daysinmonth": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.days_in_month` instead."
+     }
+    ],
+    "freq": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "A future version of pandas will return a :class:`BaseOffset` object (or ``None``) instead of a string. Use ``pd.set_option('future.infer_freq_returns_offset', True)`` to opt in to the future behavior."
+     }
+    ],
+    "weekday": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_week` instead."
+     }
+    ]
+   }
+  },
+  "Series.dt (timedelta)": {
+   "removed": {},
+   "removed_params": {
+    "as_unit": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "ceil": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "floor": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "round": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "total_seconds": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    }
+   },
+   "added": [],
+   "deprecated": {
+    "freq": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "A future version of pandas will return a :class:`BaseOffset` object (or ``None``) instead of a string. Use ``pd.set_option('future.infer_freq_returns_offset', True)`` to opt in to the future behavior."
+     }
+    ]
+   }
+  },
+  "Series.dt (period)": {
+   "removed": {},
+   "removed_params": {
+    "asfreq": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "strftime": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "to_timestamp": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    }
+   },
+   "added": [],
+   "deprecated": {
+    "dayofweek": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_week` instead."
+     }
+    ],
+    "dayofyear": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_year` instead."
+     }
+    ],
+    "daysinmonth": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.days_in_month` instead."
+     }
+    ],
+    "weekday": [
+     {
+      "version": "3.1.0",
+      "target": "member",
+      "note": "Use :attr:`Series.dt.day_of_week` instead."
+     }
+    ]
+   }
+  },
+  "Series.cat": {
+   "removed": {},
+   "removed_params": {
+    "add_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "as_ordered": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "as_unordered": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "remove_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "remove_unused_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "rename_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "reorder_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    },
+    "set_categories": {
+     "params": [
+      "args",
+      "kwargs"
+     ]
+    }
+   },
+   "added": [],
+   "deprecated": {}
+  }
+ }
+}
