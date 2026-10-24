@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/CSalcedoDataBI/pandas-for-agents/compare/v0.1.0...v0.2.0) (2026-10-24)
+
+
+### Features
+
+* **evals:** invented-name A/B hallucination eval ([#6](https://github.com/CSalcedoDataBI/pandas-for-agents/issues/6)) ([c9542e1](https://github.com/CSalcedoDataBI/pandas-for-agents/commit/c9542e11abba1866f127d801d4f9286e7491fe42))
+
 ## 0.1.0 (2026-10-24)
 
 
