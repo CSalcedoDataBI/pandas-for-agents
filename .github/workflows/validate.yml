@@ -38,7 +38,10 @@ jobs:
       - name: The change list is what build_changes.py produces
         run: python scripts/build_changes.py --check
       - name: Unit tests that need pandas (the export's deprecation parser)
-        run: uv run --no-project --python 3.13 --with pandas python -m unittest discover -s tests -v
+        # Pinned to the newest catalogue's version, so the run is reproducible.
+        run: |
+          v="$(ls catalog/pandas-*.json | sed 's|catalog/pandas-||; s|\.json||' | sort -V | tail -n 1)"
+          uv run --no-project --python 3.13 --with "pandas==$v" python -m unittest discover -s tests -v
       - name: Each catalogue is what its pandas version exports
         run: |
           for f in catalog/pandas-*.json; do
