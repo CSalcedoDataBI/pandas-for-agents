@@ -1,0 +1,7 @@
+{
+ "batch": "str",
+ "review": {
+  "verdict": "ok",
+  "problems": []
+ }
+}

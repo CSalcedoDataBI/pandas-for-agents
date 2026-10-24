@@ -1,0 +1,340 @@
+{
+ "batch": "groupby",
+ "title": "GroupBy",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, the `grouper` property, the `axis` keyword on most groupby methods, and the `obj` keyword of `DataFrameGroupBy.get_group`. It also newly deprecates index notation on `DataFrameGroupBy.nth` and passing extra `*args`/`**kwargs` to the cumulative methods such as `DataFrameGroupBy.cumsum`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull a group from a different frame.",
+      "instead": "Call `DataFrameGroupBy.get_group` with only the group name, on a groupby built from the frame you want. Alternatively, take positions from `DataFrameGroupBy.indices` and select those rows positionally.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum`, `DataFrameGroupBy.cumprod`, `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing `limit` or `axis` to `DataFrameGroupBy.pct_change`.",
+      "instead": "Call `DataFrameGroupBy.pct_change` with only `periods`, `fill_method=None` and `freq`. Fill gaps first with `DataFrameGroupBy.ffill` if needed.",
+      "since": "3.1.0",
+      "evidence": "(periods: 'int' = 1, fill_method: 'None' = None, freq=None)"
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum without extra args, and get_group with only the name.",
+     "code": "import warnings\nwarnings.simplefilter(\"error\")\n\nimport numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumsum without extra *args / **kwargs\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\n\n# get_group with the name only (no obj keyword)\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "groupby.md block 1: .simplefilter is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, `DataFrameGroupBy.grouper`, the `axis` keyword on most groupby methods, and the `obj` keyword of `DataFrameGroupBy.get_group`. It also deprecates index notation on `DataFrameGroupBy.nth` and passing extra `*args`/`**kwargs` to cumulative methods such as `DataFrameGroupBy.cumsum`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull a group from a different frame.",
+      "instead": "Call `DataFrameGroupBy.get_group` with only the group name, on a groupby built from the frame you want. Alternatively, take positions from `DataFrameGroupBy.indices` and select those rows positionally.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum`, `DataFrameGroupBy.cumprod`, `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing `limit` or `axis` to `DataFrameGroupBy.pct_change`.",
+      "instead": "Call `DataFrameGroupBy.pct_change` with only `periods`, `fill_method=None` and `freq`. Fill gaps first with `DataFrameGroupBy.ffill` if needed.",
+      "since": "3.1.0",
+      "evidence": "(periods: 'int' = 1, fill_method: 'None' = None, freq=None)"
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum without extra args, and get_group with only the name.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumsum without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\n\n# get_group with the name only (no obj keyword)\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, `DataFrameGroupBy.grouper`, the `axis` keyword on most groupby methods, and the `obj` keyword of `DataFrameGroupBy.get_group`. It also deprecates index notation on `DataFrameGroupBy.nth` and passing extra `*args`/`**kwargs` to cumulative methods such as `DataFrameGroupBy.cumsum`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull a group from a different frame.",
+      "instead": "Call `DataFrameGroupBy.get_group` with only the group name, on a groupby built from the frame you want. Alternatively, take positions from `DataFrameGroupBy.indices` and select those rows positionally.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum`, `DataFrameGroupBy.cumprod`, `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum without extra args, and get_group with only the name.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumsum without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\n\n# get_group with the name only (no obj keyword)\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "`DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, `DataFrameGroupBy.grouper`, the `axis` keyword on most groupby methods and the `obj` keyword of `DataFrameGroupBy.get_group` were removed at some point after 2.3.3 and do not exist in 3.1.0. pandas 3.1.0 also deprecates index notation on `DataFrameGroupBy.nth` and passing extra positional or keyword arguments to cumulative methods such as `DataFrameGroupBy.cumsum`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull a group from a different frame.",
+      "instead": "Call `DataFrameGroupBy.get_group` with only the group name, on a groupby built from the frame you want. Alternatively, take positions from `DataFrameGroupBy.indices` and select those rows positionally.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum`, `DataFrameGroupBy.cumprod`, `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum without extra args, and get_group with only the name.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumsum without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\n\n# get_group with the name only (no obj keyword)\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "`DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, `DataFrameGroupBy.grouper`, the `axis` keyword on most groupby methods and the `obj` keyword of `DataFrameGroupBy.get_group` are removed in 3.1.0. pandas 3.1.0 also deprecates index notation on `DataFrameGroupBy.nth`, extra positional and keyword arguments to `DataFrameGroupBy.cumsum` and `DataFrameGroupBy.cumprod`, and extra keyword arguments to `DataFrameGroupBy.cummax` and `DataFrameGroupBy.cummin`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull an existing group's rows out of a different frame.",
+      "instead": "Look up the group's row positions in `DataFrameGroupBy.indices` (with `.get(name)`) and select those rows from the other frame by position with iloc, as the deprecation note shows. This works even if the other frame lacks the grouping keys. Call `DataFrameGroupBy.get_group` with only the name when you want the group from the grouped frame itself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum` or `DataFrameGroupBy.cumprod`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``*args`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra keyword arguments to `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cummax is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum and cummax without extra arguments, and the indices/iloc replacement for get_group with obj.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumulative methods without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\ncm = gb[\"n\"].cummax()\nassert cm.tolist() == [1, 2, 3, 4, 5]\n\n# old: get_group with an obj keyword (removed); take positions from indices\nother = pd.DataFrame({\"w\": [10, 20, 30, 40, 50]})\nrows_b = other.iloc[gb.indices.get(\"b\")]\nassert rows_b[\"w\"].tolist() == [40, 50]\n\n# get_group on the grouped frame itself, name only\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "`DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna`, the `grouper` property, the `obj` keyword of `DataFrameGroupBy.get_group`, and the `axis` keyword of several methods (`DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew`, `DataFrameGroupBy.take`, `DataFrameGroupBy.pct_change`, `DataFrameGroupBy.corrwith` and the cumulative methods) no longer exist in 3.1.0; they were removed in the 3.0 series. pandas 3.1.0 also deprecates index notation on `DataFrameGroupBy.nth`, extra positional and keyword arguments to `DataFrameGroupBy.cumsum` and `DataFrameGroupBy.cumprod`, and extra keyword arguments to `DataFrameGroupBy.cummax` and `DataFrameGroupBy.cummin`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull an existing group's rows out of a different frame.",
+      "instead": "Look up the group's row positions in `DataFrameGroupBy.indices` (with `.get(name)`) and select those rows from the other frame by position with iloc, as the deprecation note shows. Call `DataFrameGroupBy.get_group` with only the name when you want the group from the grouped frame itself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum` or `DataFrameGroupBy.cumprod`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``*args`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra keyword arguments to `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cummax is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum and cummax without extra arguments, and the indices/iloc replacement for get_group with obj.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumulative methods without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\ncm = gb[\"n\"].cummax()\nassert cm.tolist() == [1, 2, 3, 4, 5]\n\n# old: get_group with an obj keyword (removed); take positions from indices\nother = pd.DataFrame({\"w\": [10, 20, 30, 40, 50]})\nrows_b = other.iloc[gb.indices.get(\"b\")]\nassert rows_b[\"w\"].tolist() == [40, 50]\n\n# get_group on the grouped frame itself, name only\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "`DataFrameGroupBy.fillna`, `SeriesGroupBy.fillna` and `DataFrameGroupBy.grouper` are absent in 3.1.0, along with the `obj` keyword of `DataFrameGroupBy.get_group` and the `axis` keyword of `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew`, `DataFrameGroupBy.take`, `DataFrameGroupBy.pct_change`, `DataFrameGroupBy.corrwith` and the cumulative methods; all were removed between 2.3.3 and 3.1.0. pandas 3.1.0 also deprecates index notation on `DataFrameGroupBy.nth`, extra positional and keyword arguments to `DataFrameGroupBy.cumsum` and `DataFrameGroupBy.cumprod`, and extra keyword arguments to `DataFrameGroupBy.cummax` and `DataFrameGroupBy.cummin`.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrameGroupBy.fillna` or `SeriesGroupBy.fillna` with a fill method such as forward fill.",
+      "instead": "Use `DataFrameGroupBy.ffill` or `DataFrameGroupBy.bfill` (`SeriesGroupBy.ffill` / `SeriesGroupBy.bfill` for a single column). To fill with a constant, use `DataFrame.fillna` or `Series.fillna` on the ungrouped object.",
+      "since": "2.2.0",
+      "evidence": "Use the :meth:`.DataFrameGroupBy.ffill` or :meth:`.DataFrameGroupBy.bfill` for forward or backward filling instead. If you want to fill with a single value, use :meth:`DataFrame.fillna` instead."
+     },
+     {
+      "trap": "Passing `axis` to `DataFrameGroupBy.shift`, `DataFrameGroupBy.diff`, `DataFrameGroupBy.rank`, `DataFrameGroupBy.idxmax`, `DataFrameGroupBy.idxmin`, `DataFrameGroupBy.skew` or `DataFrameGroupBy.take`.",
+      "instead": "Drop the `axis` keyword. For column-wise work, operate on the underlying object instead of the groupby.",
+      "since": "2.1.0",
+      "evidence": "For axis=1, operate on the underlying object instead. Otherwise the axis keyword is not necessary."
+     },
+     {
+      "trap": "Passing the `obj` keyword to `DataFrameGroupBy.get_group` to pull an existing group's rows out of a different frame.",
+      "instead": "Look up the group's row positions in `DataFrameGroupBy.indices` (with `.get(name)`) and select those rows from the other frame by position with iloc, as the deprecation note shows. Call `DataFrameGroupBy.get_group` with only the name when you want the group from the grouped frame itself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version. Do ``df.iloc[gb.indices.get(name)]`` instead of ``gb.get_group(name, obj=df)``."
+     },
+     {
+      "trap": "Using square-bracket index notation on `DataFrameGroupBy.nth`.",
+      "instead": "Call `DataFrameGroupBy.nth` as a method with the position (or list of positions) as its argument.",
+      "since": "3.1.0",
+      "evidence": "Index notation (``g.nth[n]``) is deprecated in favor of calling ``g.nth(n)`` and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments (numpy-compat leftovers) to `DataFrameGroupBy.cumsum` or `DataFrameGroupBy.cumprod`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``*args`` to GroupBy.cumsum is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing extra keyword arguments to `DataFrameGroupBy.cummax` or `DataFrameGroupBy.cummin`.",
+      "instead": "Pass only `numeric_only` and `skipna`, by keyword.",
+      "since": "3.1.0",
+      "evidence": "Passing ``**kwargs`` to GroupBy.cummax is deprecated and will be removed in a future version of pandas."
+     }
+    ],
+    "example": {
+     "explains": "Group-wise forward and backward fill replace the removed groupby fillna. The script also shows shift, diff and rank without axis, nth called as a method, cumsum and cummax without extra arguments, and the indices/iloc replacement for get_group with obj.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"key\": [\"a\", \"a\", \"a\", \"b\", \"b\"],\n    \"val\": [1.0, np.nan, 3.0, np.nan, 5.0],\n    \"n\": [1, 2, 3, 4, 5],\n})\ngb = df.groupby(\"key\")\n\n# old: groupby fillna with a fill method (removed); use ffill / bfill\nfilled = gb[\"val\"].ffill()\nassert filled.isna().tolist() == [False, False, False, True, False]\nback = gb[\"val\"].bfill()\nassert back.tolist() == [1.0, 3.0, 3.0, 5.0, 5.0]\n\n# no axis keyword on shift / diff / rank\nshifted = gb[\"n\"].shift(1, fill_value=0)\nassert shifted.tolist() == [0, 1, 2, 0, 4]\ndiffs = gb[\"n\"].diff()\nassert diffs.isna().tolist() == [True, False, False, True, False]\nranks = gb[\"n\"].rank()\nassert ranks.tolist() == [1.0, 2.0, 3.0, 1.0, 2.0]\n\n# nth is called, not indexed\nfirst_rows = gb.nth(0)\nassert list(first_rows.index) == [0, 3]\n\n# cumulative methods without extra positional or keyword arguments\ncs = gb[\"n\"].cumsum()\nassert cs.tolist() == [1, 3, 6, 4, 9]\ncm = gb[\"n\"].cummax()\nassert cm.tolist() == [1, 2, 3, 4, 5]\n\n# old: get_group with an obj keyword (removed); take positions from indices\nother = pd.DataFrame({\"w\": [10, 20, 30, 40, 50]})\nrows_b = other.iloc[gb.indices.get(\"b\")]\nassert rows_b[\"w\"].tolist() == [40, 50]\n\n# get_group on the grouped frame itself, name only\ngroup_b = gb.get_group(\"b\")\nassert group_b[\"n\"].tolist() == [4, 5]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

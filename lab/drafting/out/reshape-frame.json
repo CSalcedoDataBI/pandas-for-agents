@@ -1,0 +1,174 @@
+{
+ "batch": "reshape-frame",
+ "title": "DataFrame: reshape and combine",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "In pandas 3.1.0, `DataFrame.swapaxes` is gone, and the `method`, `limit`, `fill_axis` and `broadcast_axis` keywords of `DataFrame.align` are removed. Several keywords are deprecated: `copy` on `DataFrame.merge`, `DataFrame.align` and `DataFrame.transpose`; `dropna`, `sort` and `future_stack` on `DataFrame.stack`; `verify_integrity` on `DataFrame.set_index` (all since 3.0); and `inplace` on `DataFrame.set_index` and `DataFrame.reset_index`, plus `lsuffix`/`rsuffix` on `DataFrame.join` (since 3.1.0).",
+    "traps": [
+     {
+      "trap": "Calling `DataFrame.swapaxes` to swap rows and columns.",
+      "instead": "Use `DataFrame.transpose`.",
+      "since": "2.1.0",
+      "evidence": "``swapaxes`` is deprecated and will be removed. Please use ``transpose`` instead."
+     },
+     {
+      "trap": "Passing `method`, `limit`, `fill_axis` or `broadcast_axis` to `DataFrame.align` to fill while aligning.",
+      "instead": "Call `DataFrame.align` with only `join`, `axis`, `level` and `fill_value`. Do any forward or backward filling as a separate step on the aligned result.",
+      "since": "2.1",
+      "evidence": "level: 'Level | None' = None, copy: 'bool | lib.NoDefault' = <no_default>, fill_value: 'Hashable | None' = None)"
+     },
+     {
+      "trap": "Passing `lsuffix=` and `rsuffix=` to `DataFrame.join` for overlapping column names.",
+      "instead": "Pass one tuple, for example `suffixes=(\"_l\", \"_r\")`, to `DataFrame.join`.",
+      "since": "3.1.0",
+      "evidence": "Use ``suffixes`` instead."
+     },
+     {
+      "trap": "Using `inplace=True` with `DataFrame.set_index` or `DataFrame.reset_index`.",
+      "instead": "Assign the returned frame: `df = df.set_index(\"key\")` or `df = df.reset_index()`.",
+      "since": "3.1.0",
+      "evidence": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8"
+     },
+     {
+      "trap": "Passing `verify_integrity=True` to `DataFrame.set_index` to reject duplicate keys.",
+      "instead": "Call `DataFrame.set_index` without it. Then check uniqueness on the result's index yourself, as the deprecation note says.",
+      "since": "3.0.0",
+      "evidence": "The ``verify_integrity`` keyword is deprecated and will be removed in a future version. Check ``result.index.is_unique`` directly instead."
+     },
+     {
+      "trap": "Passing `dropna=`, `sort=` or `future_stack=` to `DataFrame.stack`.",
+      "instead": "Call `DataFrame.stack` with only `level`. The new stack implementation is already the default.",
+      "since": "3.0",
+      "evidence": "This parameter is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing `copy=False` or `copy=True` to `DataFrame.merge`, `DataFrame.align` or `DataFrame.transpose`.",
+      "instead": "Drop the keyword. Copy-on-Write always returns a new object with a lazy copy.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism"
+     }
+    ],
+    "example": {
+     "explains": "This script uses the 3.1.0 forms with every warning raised as an error: `DataFrame.merge` and `DataFrame.join` with `suffixes`, `DataFrame.set_index` with reassignment, `DataFrame.transpose` in place of the removed swapaxes, `DataFrame.align` with `fill_value` only, and `DataFrame.stack` without its deprecated keywords.",
+     "code": "import warnings\nwarnings.simplefilter(\"error\")\nimport pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"val\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"val\": [10, 20, 40]})\n\n# merge: no copy keyword\nmerged = left.merge(right, on=\"key\", how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(merged.columns) == [\"key\", \"val_l\", \"val_r\"]\nassert list(merged[\"val_r\"]) == [10, 20]\n\n# set_index: reassign instead of the inplace keyword\nl_idx = left.set_index(\"key\")\nr_idx = right.set_index(\"key\")\nassert list(l_idx.index) == [\"a\", \"b\", \"c\"]\n\n# join: one suffixes tuple instead of lsuffix/rsuffix\njoined = l_idx.join(r_idx, how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(joined.columns) == [\"val_l\", \"val_r\"]\nassert list(joined[\"val_r\"]) == [10, 20]\n\n# transpose replaces the removed swapaxes\nt = joined.transpose()\nassert list(t.columns) == [\"a\", \"b\"]\nassert list(t.index) == [\"val_l\", \"val_r\"]\n\n# align: only join and fill_value, no method/limit/fill_axis\na, b = l_idx.align(r_idx, join=\"outer\", fill_value=0)\nassert list(a.index) == [\"a\", \"b\", \"c\", \"d\"]\nassert list(a[\"val\"]) == [1, 2, 3, 0]\nassert list(b[\"val\"]) == [10, 20, 0, 40]\n\n# stack: no dropna/sort/future_stack keywords\nstacked = joined.stack()\nassert len(stacked) == 4\nassert stacked[(\"a\", \"val_r\")] == 10\nassert stacked[(\"b\", \"val_l\")] == 2\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "reshape-frame.md block 1: .simplefilter is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "In pandas 3.1.0, `DataFrame.swapaxes` is gone, and the `method`, `limit`, `fill_axis` and `broadcast_axis` keywords of `DataFrame.align` are removed. Several keywords are deprecated: `copy` on `DataFrame.merge`, `DataFrame.align` and `DataFrame.transpose`; `dropna`, `sort` and `future_stack` on `DataFrame.stack`; `verify_integrity` on `DataFrame.set_index` (all since 3.0); and `inplace` on `DataFrame.set_index` and `DataFrame.reset_index`, plus `lsuffix`/`rsuffix` on `DataFrame.join` (since 3.1.0).",
+    "traps": [
+     {
+      "trap": "Calling `DataFrame.swapaxes` to swap rows and columns.",
+      "instead": "Use `DataFrame.transpose`.",
+      "since": "2.1.0",
+      "evidence": "``swapaxes`` is deprecated and will be removed. Please use ``transpose`` instead."
+     },
+     {
+      "trap": "Passing `method`, `limit`, `fill_axis` or `broadcast_axis` to `DataFrame.align` to fill while aligning.",
+      "instead": "Call `DataFrame.align` with only `join`, `axis`, `level` and `fill_value`. Do any forward or backward filling as a separate step on the aligned result.",
+      "since": "2.1",
+      "evidence": "level: 'Level | None' = None, copy: 'bool | lib.NoDefault' = <no_default>, fill_value: 'Hashable | None' = None)"
+     },
+     {
+      "trap": "Passing `lsuffix=` and `rsuffix=` to `DataFrame.join` for overlapping column names.",
+      "instead": "Pass one tuple, for example `suffixes=(\"_l\", \"_r\")`, to `DataFrame.join`.",
+      "since": "3.1.0",
+      "evidence": "Use ``suffixes`` instead."
+     },
+     {
+      "trap": "Using `inplace=True` with `DataFrame.set_index` or `DataFrame.reset_index`.",
+      "instead": "Assign the returned frame: `df = df.set_index(\"key\")` or `df = df.reset_index()`.",
+      "since": "3.1.0",
+      "evidence": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8"
+     },
+     {
+      "trap": "Passing `verify_integrity=True` to `DataFrame.set_index` to reject duplicate keys.",
+      "instead": "Call `DataFrame.set_index` without it. Then check uniqueness on the result's index yourself, as the deprecation note says.",
+      "since": "3.0.0",
+      "evidence": "The ``verify_integrity`` keyword is deprecated and will be removed in a future version. Check ``result.index.is_unique`` directly instead."
+     },
+     {
+      "trap": "Passing `dropna=`, `sort=` or `future_stack=` to `DataFrame.stack`.",
+      "instead": "Call `DataFrame.stack` with only `level`. The new stack implementation is already the default.",
+      "since": "3.0",
+      "evidence": "This parameter is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing `copy=False` or `copy=True` to `DataFrame.merge`, `DataFrame.align` or `DataFrame.transpose`.",
+      "instead": "Drop the keyword. Copy-on-Write always returns a new object with a lazy copy.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism"
+     }
+    ],
+    "example": {
+     "explains": "This script uses only the 3.1.0 forms, so it runs cleanly when every warning is an error: `DataFrame.merge` and `DataFrame.join` with `suffixes`, `DataFrame.set_index` with reassignment, `DataFrame.transpose` in place of the removed swapaxes, `DataFrame.align` with `fill_value` only, and `DataFrame.stack` without its deprecated keywords.",
+     "code": "import pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"val\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"val\": [10, 20, 40]})\n\n# merge: no copy keyword\nmerged = left.merge(right, on=\"key\", how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(merged.columns) == [\"key\", \"val_l\", \"val_r\"]\nassert list(merged[\"val_r\"]) == [10, 20]\n\n# set_index: reassign instead of the inplace keyword\nl_idx = left.set_index(\"key\")\nr_idx = right.set_index(\"key\")\nassert list(l_idx.index) == [\"a\", \"b\", \"c\"]\n\n# join: one suffixes tuple instead of lsuffix/rsuffix\njoined = l_idx.join(r_idx, how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(joined.columns) == [\"val_l\", \"val_r\"]\nassert list(joined[\"val_r\"]) == [10, 20]\n\n# transpose replaces the removed swapaxes\nt = joined.transpose()\nassert list(t.columns) == [\"a\", \"b\"]\nassert list(t.index) == [\"val_l\", \"val_r\"]\n\n# align: only join and fill_value, no method/limit/fill_axis\na, b = l_idx.align(r_idx, join=\"outer\", fill_value=0)\nassert list(a.index) == [\"a\", \"b\", \"c\", \"d\"]\nassert list(a[\"val\"]) == [1, 2, 3, 0]\nassert list(b[\"val\"]) == [10, 20, 0, 40]\n\n# stack: no dropna/sort/future_stack keywords\nstacked = joined.stack()\nassert len(stacked) == 4\nassert stacked[(\"a\", \"val_r\")] == 10\nassert stacked[(\"b\", \"val_l\")] == 2\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "In pandas 3.1.0, `DataFrame.swapaxes` is gone, and the `method`, `limit`, `fill_axis` and `broadcast_axis` keywords of `DataFrame.align` are removed. Several keywords are deprecated: `copy` on `DataFrame.merge`, `DataFrame.align` and `DataFrame.transpose`; `dropna`, `sort` and `future_stack` on `DataFrame.stack`; `verify_integrity` on `DataFrame.set_index` (all since 3.0); and `inplace` on `DataFrame.set_index` and `DataFrame.reset_index`, plus `lsuffix`/`rsuffix` on `DataFrame.join` (since 3.1.0).",
+    "traps": [
+     {
+      "trap": "Calling `DataFrame.swapaxes` to swap rows and columns.",
+      "instead": "Use `DataFrame.transpose`.",
+      "since": "2.1.0",
+      "evidence": "``swapaxes`` is deprecated and will be removed. Please use ``transpose`` instead."
+     },
+     {
+      "trap": "Passing `method`, `limit`, `fill_axis` or `broadcast_axis` to `DataFrame.align`.",
+      "instead": "Call `DataFrame.align` with only the remaining parameters: `join`, `axis`, `level` and `fill_value`.",
+      "since": "2.1",
+      "evidence": "level: 'Level | None' = None, copy: 'bool | lib.NoDefault' = <no_default>, fill_value: 'Hashable | None' = None)"
+     },
+     {
+      "trap": "Passing `lsuffix=` and `rsuffix=` to `DataFrame.join` for overlapping column names.",
+      "instead": "Pass one tuple, for example `suffixes=(\"_l\", \"_r\")`, to `DataFrame.join`.",
+      "since": "3.1.0",
+      "evidence": "Use ``suffixes`` instead."
+     },
+     {
+      "trap": "Using `inplace=True` with `DataFrame.set_index` or `DataFrame.reset_index`.",
+      "instead": "Assign the returned frame: `df = df.set_index(\"key\")` or `df = df.reset_index()`.",
+      "since": "3.1.0",
+      "evidence": "This keyword is deprecated and will be removed in pandas 4.0. See the `whatsnew note on PDEP-8"
+     },
+     {
+      "trap": "Passing `verify_integrity=True` to `DataFrame.set_index` to reject duplicate keys.",
+      "instead": "Call `DataFrame.set_index` without it. Then check uniqueness on the result's index yourself, as the deprecation note says.",
+      "since": "3.0.0",
+      "evidence": "The ``verify_integrity`` keyword is deprecated and will be removed in a future version. Check ``result.index.is_unique`` directly instead."
+     },
+     {
+      "trap": "Passing `dropna=`, `sort=` or `future_stack=` to `DataFrame.stack`.",
+      "instead": "Call `DataFrame.stack` with only `level`.",
+      "since": "3.0",
+      "evidence": "This parameter is deprecated and will be removed in a future version of pandas."
+     },
+     {
+      "trap": "Passing `copy=False` or `copy=True` to `DataFrame.merge`, `DataFrame.align` or `DataFrame.transpose`.",
+      "instead": "Drop the keyword. Copy-on-Write always returns a new object with a lazy copy.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0. Since pandas 3.0, this method always returns a new object using a lazy copy mechanism"
+     }
+    ],
+    "example": {
+     "explains": "This script uses only the 3.1.0 forms, so it runs cleanly when every warning is an error: `DataFrame.merge` and `DataFrame.join` with `suffixes`, `DataFrame.set_index` with reassignment, `DataFrame.transpose` in place of the removed `DataFrame.swapaxes`, `DataFrame.align` with `join` and `fill_value` only, and `DataFrame.stack` without its deprecated keywords.",
+     "code": "import pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"val\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"val\": [10, 20, 40]})\n\n# merge: no copy keyword\nmerged = left.merge(right, on=\"key\", how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(merged.columns) == [\"key\", \"val_l\", \"val_r\"]\nassert list(merged[\"val_r\"]) == [10, 20]\n\n# set_index: reassign instead of the inplace keyword\nl_idx = left.set_index(\"key\")\nr_idx = right.set_index(\"key\")\nassert list(l_idx.index) == [\"a\", \"b\", \"c\"]\nassert l_idx.index.is_unique\n\n# join: one suffixes tuple instead of lsuffix/rsuffix\njoined = l_idx.join(r_idx, how=\"inner\", suffixes=(\"_l\", \"_r\"))\nassert list(joined.columns) == [\"val_l\", \"val_r\"]\nassert list(joined[\"val_r\"]) == [10, 20]\n\n# transpose replaces the removed swapaxes\nt = joined.transpose()\nassert list(t.columns) == [\"a\", \"b\"]\nassert list(t.index) == [\"val_l\", \"val_r\"]\n\n# align: only join and fill_value\na, b = l_idx.align(r_idx, join=\"outer\", fill_value=0)\nassert list(a.index) == [\"a\", \"b\", \"c\", \"d\"]\nassert list(a[\"val\"]) == [1, 2, 3, 0]\nassert list(b[\"val\"]) == [10, 20, 0, 40]\n\n# stack: no dropna/sort/future_stack keywords\nstacked = joined.stack()\nassert len(stacked) == 4\nassert stacked[(\"a\", \"val_r\")] == 10\nassert stacked[(\"b\", \"val_l\")] == 2\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

@@ -3,8 +3,9 @@
 This repository is **public and in pre-release**. Write every issue and commit with that in mind:
 no client names, no real engagements, no credentials, and nothing from private repositories.
 
-It follows [NORTE](https://github.com/CSalcedoDataBI/docker-lab/blob/main/NORTE.md). The north for
-every PR is [FICHA.md](FICHA.md), and `.claude/agents/experto.md` merges against it.
+It is maintained under the maintainer's internal rules: the north for every PR is
+[FICHA.md](FICHA.md), and the `experto` agent (`.claude/agents/experto.md`) merges against it.
+Outside contributions follow [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Rules specific to this repo
 
@@ -18,5 +19,5 @@ every PR is [FICHA.md](FICHA.md), and `.claude/agents/experto.md` merges against
 - **Every number in the README is counted from the tree**, not typed. Until a check backs a
   number, do not write it.
 - **CI runs on GitHub runners, never on a self-hosted one.** The repo is public, and a self-hosted
-  runner would execute fork PRs on the maintainer's machine (DIRECTRICES, RUNSEC A exception).
+  runner would execute fork PRs on the maintainer's machine.
 - The repository is in English. Specs and ADRs under `docs/` are in Spanish, as in dax-for-agents.

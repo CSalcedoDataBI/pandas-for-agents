@@ -1,0 +1,193 @@
+{
+ "batch": "window",
+ "title": "Windows, shifts and resampling",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the axis keyword was removed from `DataFrame.rolling`, `DataFrame.expanding`, `DataFrame.ewm` and `DataFrame.resample`, along with kind on `DataFrame.resample` and limit on `DataFrame.pct_change`. On the `Resampler` side, `Resampler.fillna` and `Resampler.grouper` are gone, `Resampler.interpolate` no longer takes inplace or downcast, and `Resampler.get_group` no longer takes obj.",
+    "traps": [
+     {
+      "trap": "Passing axis=1 to `DataFrame.rolling` to roll across columns.",
+      "instead": "Call `DataFrame.rolling` without axis. For column-wise windows, transpose the DataFrame first and then roll.",
+      "since": "2.1.0",
+      "evidence": "The axis keyword is deprecated. For ``axis=1``, transpose the DataFrame first instead."
+     },
+     {
+      "trap": "Passing axis to `DataFrame.resample`.",
+      "instead": "Call `DataFrame.resample` on a frame whose row index holds the timestamps. Transpose the frame first if the timestamps are on the columns.",
+      "since": "2.0.0",
+      "evidence": "Use frame.T.resample(...) instead."
+     },
+     {
+      "trap": "Passing kind='period' or kind='timestamp' to `DataFrame.resample`.",
+      "instead": "Convert the index to the type you want before calling `DataFrame.resample`.",
+      "since": "2.2.0",
+      "evidence": "Convert index to desired type explicitly instead."
+     },
+     {
+      "trap": "Passing limit (or relying on an implicit fill) in `DataFrame.pct_change`.",
+      "instead": "Call `DataFrame.pct_change` with periods and freq only. fill_method defaults to None, so fill gaps yourself before the call if you need that.",
+      "since": "2.1",
+      "evidence": "periods: 'int' = 1, fill_method: 'None' = None, freq=None, **kwargs"
+     },
+     {
+      "trap": "Calling `Resampler.fillna` with method='ffill', 'bfill' or 'nearest' after upsampling.",
+      "instead": "Call `Resampler.ffill`, `Resampler.bfill` or `Resampler.nearest` directly. Each takes an optional limit.",
+      "since": "3.1.0",
+      "evidence": "Fill missing values introduced by upsampling."
+     },
+     {
+      "trap": "Calling `Resampler.get_group` with obj=df.",
+      "instead": "Call `Resampler.get_group` with the group name only, or use the positions from `Resampler.indices` to select rows from the frame yourself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version."
+     },
+     {
+      "trap": "Passing inplace or downcast to `Resampler.interpolate`.",
+      "instead": "Assign the result of `Resampler.interpolate` to a variable. Change dtypes in a separate step if needed.",
+      "since": "2.1.0",
+      "evidence": "method: 'InterpolateOptions' = 'linear', axis: 'Axis' = 0, limit: 'int | None' = None"
+     },
+     {
+      "trap": "Passing axis to `DataFrame.expanding` or `DataFrame.ewm`.",
+      "instead": "Call `DataFrame.expanding` and `DataFrame.ewm` without axis. Transpose the DataFrame first for column-wise windows.",
+      "since": "3.1.0",
+      "evidence": "(min_periods: 'int' = 1, method:"
+     }
+    ],
+    "example": {
+     "explains": "Rolling, expanding, downsampling, upsampling with ffill and interpolate, and pct_change, all written without removed keywords or `Resampler.fillna`.",
+     "code": "import datetime as dt\nimport pandas as pd\n\nidx = [dt.datetime(2024, 1, 1) + dt.timedelta(hours=h) for h in range(6)]\ndf = pd.DataFrame({\"x\": [1.0, 2.0, None, 4.0, 5.0, 6.0]}, index=idx)\n\n# rolling without the removed axis keyword\nroll = df.rolling(2, min_periods=1).sum()\nassert list(roll[\"x\"]) == [1.0, 3.0, 2.0, 4.0, 9.0, 11.0]\n\n# expanding without axis\nexp = df.expanding().sum()\nassert list(exp[\"x\"]) == [1.0, 3.0, 3.0, 7.0, 12.0, 18.0]\n\n# downsample without axis or kind\nr = df.resample(\"2h\").sum()\nassert list(r[\"x\"]) == [3.0, 4.0, 11.0]\n\n# upsample: use ffill instead of the removed fillna(method=...)\ndf2 = pd.DataFrame({\"y\": [10.0, 20.0]}, index=idx[:2])\nup = df2.resample(\"30min\").ffill()\nassert list(up[\"y\"]) == [10.0, 10.0, 20.0]\n\n# interpolate returns a new object; no inplace or downcast\ninterp = df2.resample(\"30min\").interpolate()\nassert list(interp[\"y\"]) == [10.0, 15.0, 20.0]\n\n# pct_change without limit; fill_method defaults to None\np = pd.DataFrame({\"p\": [100.0, 110.0, 121.0]})\npc = list(p.pct_change()[\"p\"])\nassert pc[0] != pc[0]  # first value is NaN\nassert abs(pc[1] - 0.1) < 1e-12 and abs(pc[2] - 0.1) < 1e-12\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "window.md block 1: .datetime is not in pandas 3.1.0",
+    "window.md block 1: .timedelta is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the axis keyword was removed from `DataFrame.rolling`, `DataFrame.expanding`, `DataFrame.ewm` and `DataFrame.resample`, along with kind on `DataFrame.resample` and limit on `DataFrame.pct_change`. On the `Resampler` side, `Resampler.fillna` and `Resampler.grouper` are gone, `Resampler.interpolate` no longer takes inplace or downcast, and `Resampler.get_group` no longer takes obj.",
+    "traps": [
+     {
+      "trap": "Passing axis=1 to `DataFrame.rolling` to roll across columns.",
+      "instead": "Call `DataFrame.rolling` without axis. For column-wise windows, transpose the DataFrame first and then roll.",
+      "since": "2.1.0",
+      "evidence": "The axis keyword is deprecated. For ``axis=1``, transpose the DataFrame first instead."
+     },
+     {
+      "trap": "Passing axis to `DataFrame.resample`.",
+      "instead": "Call `DataFrame.resample` on a frame whose row index holds the timestamps. Transpose the frame first if the timestamps are on the columns.",
+      "since": "2.0.0",
+      "evidence": "Use frame.T.resample(...) instead."
+     },
+     {
+      "trap": "Passing kind='period' or kind='timestamp' to `DataFrame.resample`.",
+      "instead": "Convert the index to the type you want before calling `DataFrame.resample`.",
+      "since": "2.2.0",
+      "evidence": "Convert index to desired type explicitly instead."
+     },
+     {
+      "trap": "Passing limit, or relying on an implicit fill, in `DataFrame.pct_change`.",
+      "instead": "Call `DataFrame.pct_change` with periods and freq only. fill_method defaults to None, so fill gaps yourself before the call if you need that.",
+      "since": "2.1",
+      "evidence": "periods: 'int' = 1, fill_method: 'None' = None, freq=None, **kwargs"
+     },
+     {
+      "trap": "Calling `Resampler.fillna` with method='ffill', 'bfill' or 'nearest' after upsampling.",
+      "instead": "Call `Resampler.ffill`, `Resampler.bfill` or `Resampler.nearest` directly. Each takes an optional limit.",
+      "since": "3.1.0",
+      "evidence": "Fill missing values introduced by upsampling."
+     },
+     {
+      "trap": "Calling `Resampler.get_group` with obj=df.",
+      "instead": "Call `Resampler.get_group` with the group name only, or use the positions from `Resampler.indices` to select rows from the frame yourself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version."
+     },
+     {
+      "trap": "Passing inplace or downcast to `Resampler.interpolate`.",
+      "instead": "Assign the result of `Resampler.interpolate` to a variable. Change dtypes in a separate step if needed.",
+      "since": "2.1.0",
+      "evidence": "method: 'InterpolateOptions' = 'linear', axis: 'Axis' = 0, limit: 'int | None' = None"
+     },
+     {
+      "trap": "Passing axis to `DataFrame.expanding` or `DataFrame.ewm`.",
+      "instead": "Call `DataFrame.expanding` and `DataFrame.ewm` without axis. Transpose the DataFrame first for column-wise windows.",
+      "since": "3.1.0",
+      "evidence": "(min_periods: 'int' = 1, method:"
+     }
+    ],
+    "example": {
+     "explains": "Rolling, expanding, downsampling, upsampling with ffill and interpolate, and pct_change, all written without removed keywords or the removed Resampler fill method.",
+     "code": "from datetime import datetime, timedelta\nimport pandas as pd\n\nidx = [datetime(2024, 1, 1) + timedelta(hours=h) for h in range(6)]\ndf = pd.DataFrame({\"x\": [1.0, 2.0, None, 4.0, 5.0, 6.0]}, index=idx)\n\n# rolling without the removed axis keyword\nroll = df.rolling(2, min_periods=1).sum()\nassert list(roll[\"x\"]) == [1.0, 3.0, 2.0, 4.0, 9.0, 11.0]\n\n# expanding without axis\nexp = df.expanding().sum()\nassert list(exp[\"x\"]) == [1.0, 3.0, 3.0, 7.0, 12.0, 18.0]\n\n# downsample without axis or kind\nr = df.resample(\"2h\").sum()\nassert list(r[\"x\"]) == [3.0, 4.0, 11.0]\n\n# upsample: use ffill instead of the removed fillna with a method argument\ndf2 = pd.DataFrame({\"y\": [10.0, 20.0]}, index=idx[:2])\nup = df2.resample(\"30min\").ffill()\nassert list(up[\"y\"]) == [10.0, 10.0, 20.0]\n\n# interpolate returns a new object; no inplace or downcast\ninterp = df2.resample(\"30min\").interpolate()\nassert list(interp[\"y\"]) == [10.0, 15.0, 20.0]\n\n# pct_change without limit; fill_method defaults to None\np = pd.DataFrame({\"p\": [100.0, 110.0, 121.0]})\npc = list(p.pct_change()[\"p\"])\nassert pc[0] != pc[0]  # first value is NaN\nassert abs(pc[1] - 0.1) < 1e-12 and abs(pc[2] - 0.1) < 1e-12\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the axis keyword was removed from `DataFrame.rolling`, `DataFrame.expanding`, `DataFrame.ewm` and `DataFrame.resample`, along with kind on `DataFrame.resample` and limit on `DataFrame.pct_change`. On the Resampler side, `Resampler.fillna` and `Resampler.grouper` are gone, `Resampler.interpolate` no longer takes inplace or downcast, and `Resampler.get_group` no longer takes obj.",
+    "traps": [
+     {
+      "trap": "Passing axis=1 to `DataFrame.rolling` to roll across columns.",
+      "instead": "Call `DataFrame.rolling` without axis. For column-wise windows, transpose the DataFrame first and then roll.",
+      "since": "2.1.0",
+      "evidence": "The axis keyword is deprecated. For ``axis=1``, transpose the DataFrame first instead."
+     },
+     {
+      "trap": "Passing axis to `DataFrame.resample`.",
+      "instead": "Call `DataFrame.resample` on a frame whose row index holds the timestamps. Transpose the frame first if the timestamps are on the columns.",
+      "since": "2.0.0",
+      "evidence": "Use frame.T.resample(...) instead."
+     },
+     {
+      "trap": "Passing kind='period' or kind='timestamp' to `DataFrame.resample`.",
+      "instead": "Convert the index to the type you want before calling `DataFrame.resample`.",
+      "since": "2.2.0",
+      "evidence": "Convert index to desired type explicitly instead."
+     },
+     {
+      "trap": "Passing limit to `DataFrame.pct_change`.",
+      "instead": "Call `DataFrame.pct_change` with periods and freq only; fill_method accepts only None. If you need gaps filled, fill them yourself before the call.",
+      "since": "2.1",
+      "evidence": "periods: 'int' = 1, fill_method: 'None' = None, freq=None, **kwargs"
+     },
+     {
+      "trap": "Calling `Resampler.fillna` with method='ffill', 'bfill' or 'nearest' after upsampling.",
+      "instead": "Call `Resampler.ffill`, `Resampler.bfill` or `Resampler.nearest` directly. Each takes an optional limit.",
+      "since": "3.1.0",
+      "evidence": "Fill missing values introduced by upsampling."
+     },
+     {
+      "trap": "Calling `Resampler.get_group` with obj=df.",
+      "instead": "Call `Resampler.get_group` with the group name only, or use the positions from `Resampler.indices` to select rows from the frame yourself.",
+      "since": "2.1.0",
+      "evidence": "The obj is deprecated and will be removed in a future version."
+     },
+     {
+      "trap": "Passing downcast to `Resampler.interpolate`.",
+      "instead": "Call `Resampler.interpolate` without downcast and change dtypes in a separate step if needed.",
+      "since": "2.1.0",
+      "evidence": "method: 'InterpolateOptions' = 'linear', axis: 'Axis' = 0, limit: 'int | None' = None"
+     },
+     {
+      "trap": "Passing axis to `DataFrame.expanding` or `DataFrame.ewm`.",
+      "instead": "Call `DataFrame.expanding` and `DataFrame.ewm` without axis. Transpose the DataFrame first for column-wise windows.",
+      "since": "3.1.0",
+      "evidence": "(min_periods: 'int' = 1, method:"
+     }
+    ],
+    "example": {
+     "explains": "Rolling, expanding, downsampling, upsampling with ffill and interpolate, and pct_change, all written without removed keywords or the removed Resampler fill method.",
+     "code": "from datetime import datetime, timedelta\nimport pandas as pd\n\nidx = [datetime(2024, 1, 1) + timedelta(hours=h) for h in range(6)]\ndf = pd.DataFrame({\"x\": [1.0, 2.0, None, 4.0, 5.0, 6.0]}, index=idx)\n\n# rolling without the removed axis keyword\nroll = df.rolling(2, min_periods=1).sum()\nassert list(roll[\"x\"]) == [1.0, 3.0, 2.0, 4.0, 9.0, 11.0]\n\n# expanding without axis\nexp = df.expanding().sum()\nassert list(exp[\"x\"]) == [1.0, 3.0, 3.0, 7.0, 12.0, 18.0]\n\n# downsample without axis or kind\nr = df.resample(\"2h\").sum()\nassert list(r[\"x\"]) == [3.0, 4.0, 11.0]\n\n# upsample: use ffill instead of the removed fillna with a method argument\ndf2 = pd.DataFrame({\"y\": [10.0, 20.0]}, index=idx[:2])\nup = df2.resample(\"30min\").ffill()\nassert list(up[\"y\"]) == [10.0, 10.0, 20.0]\n\n# interpolate returns a new object; no inplace or downcast\ninterp = df2.resample(\"30min\").interpolate()\nassert list(interp[\"y\"]) == [10.0, 15.0, 20.0]\n\n# pct_change without limit; fill_method stays None\np = pd.DataFrame({\"p\": [100.0, 110.0, 121.0]})\npc = list(p.pct_change()[\"p\"])\nassert pc[0] != pc[0]  # first value is NaN\nassert abs(pc[1] - 0.1) < 1e-12 and abs(pc[2] - 0.1) < 1e-12\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

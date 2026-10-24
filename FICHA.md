@@ -1,7 +1,8 @@
 # Ficha — pandas-for-agents
 
 > Ficha NORTE de esta herramienta. La lee su experto (`.claude/agents/experto.md`) en cada PR.
-> Guía: [NORTE.md](https://github.com/CSalcedoDataBI/docker-lab/blob/main/NORTE.md).
+> Se mantiene con las reglas internas del mantenedor: su norte es `FICHA.md` y el agente
+> `experto` fusiona contra ella.
 > Cambiarla exige una nueva aprobación de Cristóbal.
 
 ## Qué es
@@ -52,4 +53,4 @@ Lo que no se toca sin un paso del plan que lo nombre:
 
 ## Aprobación
 
-Aprobada:
+Aprobada: 2026-10-23

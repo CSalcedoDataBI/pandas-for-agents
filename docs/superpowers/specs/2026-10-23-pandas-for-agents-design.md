@@ -26,7 +26,7 @@ por versión, en local o en runners de GitHub (repo público, minutos gratis).
 
 ## 3. Antes de escribir nada (NORTE R2)
 
-Hecho en el comentario de [docker-lab#38](https://github.com/CSalcedoDataBI/docker-lab/issues/38):
+Hecho el 2026-10-23, con una búsqueda en GitHub de skills y catálogos de pandas para agentes:
 
 - Para pandas solo hay **guías generales** escritas a mano, sueltas en colecciones grandes
   (`JetBrains/skills` y otras). Ninguna publica un catálogo sacado del propio paquete, por versión,

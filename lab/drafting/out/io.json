@@ -1,0 +1,341 @@
+{
+ "batch": "io",
+ "title": "Reading and writing data",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `pd.read_gbq` and several `pd.read_csv`, `pd.read_table`, `pd.read_excel` and `pd.read_parquet` keyword arguments (`delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose`, `keep_date_col`, `use_nullable_dtypes`) that were deprecated in 2.x. It also deprecates `float_precision` in the CSV readers, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `parse_dates` together with a `date_format` string to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; strict format inference is already the default. Pass `date_format` if the format is known.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Pass `dtype=False` to `pd.read_json` to disable type conversion, and parse the date columns yourself after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text using `sep` with a regex instead of the removed whitespace flag, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "import io\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old form used the whitespace flag and a date parser callable; both keywords are removed in 3.1.0\ndf = pd.read_csv(io.StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert df[\"date\"].dtype.kind == \"M\"\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(io.StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "io.md block 1: .kind is not in pandas 3.1.0",
+    "io.md block 1: .StringIO is not in pandas 3.1.0",
+    "io.md block 1: .StringIO is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `pd.read_gbq` and several keyword arguments of `pd.read_csv`, `pd.read_table`, `pd.read_excel` and `pd.read_parquet` (`delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose`, `keep_date_col`, `use_nullable_dtypes`) that were deprecated in 2.x. It also deprecates `float_precision` in the CSV readers, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `parse_dates` together with a `date_format` string to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; strict format inference is already the default. Pass `date_format` if the format is known.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Pass `dtype=False` to `pd.read_json` to disable type conversion, and parse the date columns yourself after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text using `sep` with a regex instead of the removed whitespace flag, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "from io import StringIO\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old form used the whitespace flag and a date parser callable; both keywords are removed in 3.1.0\ndf = pd.read_csv(StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert \"datetime64\" in str(df[\"date\"].dtype)\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `pd.read_gbq` and several keyword arguments of `pd.read_csv`, `pd.read_table`, `pd.read_excel` and `pd.read_parquet` (`delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose`, `keep_date_col`, `use_nullable_dtypes`) that were deprecated in 2.x. It also deprecates `float_precision` in the CSV readers, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `parse_dates` together with a `date_format` string to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; strict format inference is already the default. Pass `date_format` if the format is known.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Choose one of two alternatives: pass `dtype=False` to `pd.read_json` if you want type conversion turned off, or, if you want date columns, leave conversion on and parse those columns into datetimes after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text using `sep` with a regex instead of the removed whitespace flag, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "from io import StringIO\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old form used the whitespace flag and a date parser callable; both keywords are removed in 3.1.0\ndf = pd.read_csv(StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert \"datetime64\" in str(df[\"date\"].dtype)\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `pd.read_gbq`, the `delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose` and `keep_date_col` keywords of `pd.read_csv` and `pd.read_table`, the `date_parser` keyword of `pd.read_excel`, the `use_nullable_dtypes` keyword of `pd.read_parquet` and the `dtype_backend` keyword of `pd.read_fwf`. It also deprecates `float_precision` in `pd.read_csv` and `pd.read_table`, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `date_format` (with `parse_dates`) to the reader, or read the column in as `object` and then apply `pd.to_datetime` as needed when a single format string cannot express the parsing logic.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; the strict version is already the default. Pass `date_format` if the format is known.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Pass `dtype=False` to `pd.read_json` to disable type conversion, or parse date columns with `pd.to_datetime` after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text with `pd.read_csv` using `sep` with a regex instead of the removed whitespace flag, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "from io import StringIO\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old form used the whitespace flag and a date parser callable; both keywords are removed in 3.1.0\ndf = pd.read_csv(StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert \"datetime64\" in str(df[\"date\"].dtype)\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "As of 3.1.0, `pd.read_gbq` is gone, `pd.read_csv` and `pd.read_table` no longer accept `delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose` or `keep_date_col`, `pd.read_excel` no longer accepts `date_parser`, and `pd.read_parquet` no longer accepts `use_nullable_dtypes`. pandas 3.1.0 also deprecates `float_precision` in `pd.read_csv` and `pd.read_table`, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `date_format` (with `parse_dates`) to the reader, or read the column in as `object` and then apply `pd.to_datetime` as needed when a single format string cannot express the parsing logic.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; the strict version is already the default. Pass `date_format` if the format is known.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Pass `dtype=False` to `pd.read_json` to disable type conversion, or parse date columns with `pd.to_datetime` after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text with `pd.read_csv` using `sep` with a regex instead of the whitespace flag that is no longer accepted, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "from io import StringIO\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old code used the whitespace flag and a date parser callable; neither keyword is accepted as of 3.1.0\ndf = pd.read_csv(StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert \"datetime64\" in str(df[\"date\"].dtype)\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "As of 3.1.0, `pd.read_gbq` is gone, `pd.read_csv` and `pd.read_table` no longer accept `delim_whitespace`, `date_parser`, `infer_datetime_format`, `verbose` or `keep_date_col`, `pd.read_excel` no longer accepts `date_parser`, and `pd.read_parquet` no longer accepts `use_nullable_dtypes`. pandas 3.1.0 also deprecates `float_precision` in `pd.read_csv` and `pd.read_table`, `convert_dates` and `keep_default_dates` in `pd.read_json`, and the 'fastparquet' and 'auto' engines of `pd.read_parquet`.",
+    "traps": [
+     {
+      "trap": "Passing the `delim_whitespace` keyword to `pd.read_csv` or `pd.read_table` to split on runs of spaces.",
+      "instead": "Pass the `sep` keyword with the regex `\\s+` to `pd.read_csv` or `pd.read_table`.",
+      "since": "2.2.0",
+      "evidence": "Use ``sep=\"\\s+\"`` instead."
+     },
+     {
+      "trap": "Passing a `date_parser` callable to `pd.read_csv`, `pd.read_table` or `pd.read_excel`.",
+      "instead": "Pass `date_format` (with `parse_dates`) to the reader, or read the column in as `object` and then apply `pd.to_datetime` as needed when a single format string cannot express the parsing logic.",
+      "since": "2.0.0",
+      "evidence": "Use ``date_format`` instead, or read in as ``object`` and then apply :func:`~pandas.to_datetime` as-needed."
+     },
+     {
+      "trap": "Passing `infer_datetime_format` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Drop the keyword; the strict version is already the default and passing it had no effect.",
+      "since": "2.0.0",
+      "evidence": "A strict version of this argument is now the default, passing it has no effect."
+     },
+     {
+      "trap": "Calling `pd.read_gbq` to load Google BigQuery data.",
+      "instead": "Use `pandas_gbq.read_gbq` from the separate pandas-gbq package.",
+      "since": "2.2.0",
+      "evidence": "Please use ``pandas_gbq.read_gbq`` instead."
+     },
+     {
+      "trap": "Passing `float_precision` to `pd.read_csv` or `pd.read_table`.",
+      "instead": "Omit `float_precision`; every mode now uses the same converter.",
+      "since": "3.1.0",
+      "evidence": "All float precision modes now use the same converter. The ``float_precision`` argument will be removed in a future version."
+     },
+     {
+      "trap": "Passing `convert_dates` or `keep_default_dates` to `pd.read_json`.",
+      "instead": "Pass `dtype=False` to `pd.read_json` to disable type conversion, or parse date columns with `pd.to_datetime` after reading.",
+      "since": "3.1.0",
+      "evidence": "Pass ``dtype=False`` to disable type conversion, or parse date columns with :func:`~pandas.to_datetime` after reading."
+     },
+     {
+      "trap": "Passing 'fastparquet' or 'auto' as the `engine` of `pd.read_parquet`.",
+      "instead": "Pass 'pyarrow' as the `engine`, or omit `engine` to use the default.",
+      "since": "3.1.0",
+      "evidence": "The ``'fastparquet'`` and ``'auto'`` engine options are deprecated. Use ``'pyarrow'`` or do not pass ``engine`` to use the default."
+     }
+    ],
+    "example": {
+     "explains": "Reads whitespace-separated text with `pd.read_csv` using `sep` with a regex instead of the whitespace flag that is no longer accepted, parses dates with `parse_dates` and `date_format` instead of a parser callable, and reads a TSV with `pd.read_table` without `float_precision`.",
+     "code": "from io import StringIO\nimport pandas as pd\n\nraw = \"date value\\n2024-01-05 10\\n2024-02-10 20\\n2024-03-15 30\\n\"\n# old code used the whitespace flag and a date parser callable; neither keyword is accepted as of 3.1.0\ndf = pd.read_csv(StringIO(raw), sep=r\"\\s+\", parse_dates=[\"date\"], date_format=\"%Y-%m-%d\")\nassert list(df.columns) == [\"date\", \"value\"]\nassert df.shape == (3, 2)\nassert \"datetime64\" in str(df[\"date\"].dtype)\nassert df[\"value\"].tolist() == [10, 20, 30]\n\ntsv = \"name\\tscore\\na\\t1.5\\nb\\t2.5\\n\"\n# no float precision keyword: all modes use the same converter in 3.1.0\nt = pd.read_table(StringIO(tsv))\nassert t[\"score\"].tolist() == [1.5, 2.5]\nassert t.shape == (2, 2)\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}
