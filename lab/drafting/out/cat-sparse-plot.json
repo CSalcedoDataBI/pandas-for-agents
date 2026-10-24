@@ -1,0 +1,346 @@
+{
+ "batch": "cat-sparse-plot",
+ "title": "The .cat, .sparse and .plot accessors",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "In 3.1.0 the `Series.cat` methods dropped their catch-all args and kwargs parameters and now accept only the arguments in their signatures, so extra positional or keyword arguments raise an error instead of being passed through. The `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors have no removed names or keyword arguments between 2.3.3 and 3.1.0.",
+    "traps": [
+     {
+      "trap": "Passing extra keyword arguments, such as an old inplace flag, to `Series.cat.set_categories` and relying on the removed args and kwargs to accept them.",
+      "instead": "Pass only new_categories, ordered and rename, and assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Calling `Series.cat.reorder_categories` with extra positional or keyword arguments beyond its signature.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the result.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Calling `Series.cat.add_categories` or `Series.cat.rename_categories` with extra arguments that the removed args and kwargs used to accept.",
+      "instead": "Pass only new_categories (a list for add, or a list, dict or callable for rename) and assign the result.",
+      "since": "3.1.0",
+      "evidence": "\"signature\": \"(new_categories)\""
+     },
+     {
+      "trap": "Calling `Series.cat.remove_categories` with extra arguments beyond the removals.",
+      "instead": "Pass only the removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "\"signature\": \"(removals)\""
+     },
+     {
+      "trap": "Passing any argument, including an old inplace flag, to `Series.cat.as_ordered` or `Series.cat.as_unordered`.",
+      "instead": "Call them with no arguments and assign the result: s = s.cat.as_ordered().",
+      "since": "3.1.0",
+      "evidence": "Set the Categorical to be ordered."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.remove_unused_categories`.",
+      "instead": "Call it with no arguments and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove categories which are not used."
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series (no in-place flags), and checks categories, codes and ordering.",
+     "code": "import warnings\nwarnings.simplefilter(\"error\")\n\nimport pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# Old code passed extra flags through catch-all arguments; 3.1.0 accepts only the signature.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories({\"z\": \"zz\"})\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nassert s.max() == \"a\"\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "cat-sparse-plot.md block 1: .simplefilter is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "In 3.1.0 the `Series.cat` methods no longer have catch-all args and kwargs parameters. Extra positional or keyword arguments now raise an error instead of being passed through. The `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors have no removed names or keyword arguments between 2.3.3 and 3.1.0.",
+    "traps": [
+     {
+      "trap": "Passing extra keyword arguments to `Series.cat.set_categories`, such as an old inplace flag, and expecting the removed args and kwargs to accept them.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Calling `Series.cat.reorder_categories` with positional or keyword arguments beyond its signature.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the result.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Calling `Series.cat.add_categories` with extra arguments that the removed args and kwargs used to accept.",
+      "instead": "Pass only new_categories and assign the result.",
+      "since": "3.1.0",
+      "evidence": "Add new categories."
+     },
+     {
+      "trap": "Calling `Series.cat.remove_categories` with arguments beyond the removals.",
+      "instead": "Pass only the removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove the specified categories."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.as_ordered` or `Series.cat.as_unordered`, including an old inplace flag.",
+      "instead": "Call them with no arguments and assign the result: s = s.cat.as_ordered().",
+      "since": "3.1.0",
+      "evidence": "Set the Categorical to be ordered."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.remove_unused_categories`.",
+      "instead": "Call it with no arguments and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove categories which are not used."
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series instead of modifying in place, and checks the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# Old code passed extra flags through catch-all arguments; 3.1.0 accepts only the signature.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories({\"z\": \"zz\"})\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "In 3.1.0 the `Series.cat` methods lost their catch-all args and kwargs parameters, so extra positional or keyword arguments now raise instead of being silently accepted. The `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors have no removed names or keyword arguments between 2.3.3 and 3.1.0.",
+    "traps": [
+     {
+      "trap": "Passing extra positional or keyword arguments to `Series.cat.set_categories` beyond its signature, expecting the removed args and kwargs to absorb them.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Calling `Series.cat.reorder_categories` with positional or keyword arguments beyond its signature.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the result.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Calling `Series.cat.add_categories` with extra arguments that the removed args and kwargs used to accept.",
+      "instead": "Pass only new_categories and assign the result.",
+      "since": "3.1.0",
+      "evidence": "Add new categories."
+     },
+     {
+      "trap": "Calling `Series.cat.remove_categories` with arguments beyond the removals.",
+      "instead": "Pass only the removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove the specified categories."
+     },
+     {
+      "trap": "Passing any positional or keyword argument to `Series.cat.as_ordered` or `Series.cat.as_unordered`.",
+      "instead": "Call them with no arguments and assign the result: s = s.cat.as_ordered().",
+      "since": "3.1.0",
+      "evidence": "Set the Categorical to be ordered."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.remove_unused_categories`.",
+      "instead": "Call it with no arguments and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove categories which are not used."
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series, and checks the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# Old code could pass extra arguments through catch-all parameters; 3.1.0 accepts only the signature.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories({\"z\": \"zz\"})\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the `Series.cat` methods lost the args and kwargs parameters from their signatures, so each method takes only the parameters its 3.1.0 signature lists. The excerpt lists no removed names or keyword arguments for the `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors.",
+    "traps": [
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.set_categories` by passing arguments beyond new_categories, ordered and rename.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.reorder_categories` by passing arguments beyond new_categories and ordered.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the result.",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.add_categories` by passing anything besides new_categories.",
+      "instead": "Pass only new_categories and assign the result.",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "Add new categories."
+     },
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.remove_categories` by passing anything besides removals.",
+      "instead": "Pass only removals and assign the returned Series.",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "Remove the specified categories."
+     },
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.as_ordered` or `Series.cat.as_unordered` by passing any argument.",
+      "instead": "Call them with no arguments and assign the result: s = s.cat.as_ordered().",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "Set the Categorical to be ordered."
+     },
+     {
+      "trap": "Relying on the old args and kwargs parameters of `Series.cat.remove_unused_categories` by passing any argument.",
+      "instead": "Call it with no arguments and assign the returned Series.",
+      "since": "3.1.0 (removed after 2.3.3; the excerpt gives no exact release)",
+      "evidence": "Remove categories which are not used."
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series, and checks the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# The 3.1.0 signatures list only the parameters used below; the old args/kwargs parameters are gone.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories({\"z\": \"zz\"})\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the `Series.cat` methods lost the args and kwargs parameters, so each method now accepts only the parameters in its 3.1.0 signature. The excerpt lists no removed names or keyword arguments for the `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors.",
+    "traps": [
+     {
+      "trap": "Passing arguments beyond new_categories, ordered and rename to `Series.cat.set_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Passing arguments beyond new_categories and ordered to `Series.cat.reorder_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the result.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.rename_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories (a list or a dict mapping old to new names) and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Rename categories."
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.add_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories and assign the result.",
+      "since": "3.1.0",
+      "evidence": "Add new categories."
+     },
+     {
+      "trap": "Passing anything besides removals to `Series.cat.remove_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove the specified categories."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.as_ordered` or `Series.cat.as_unordered`, relying on the old args and kwargs parameters.",
+      "instead": "Call them with no arguments and assign the result: s = s.cat.as_ordered().",
+      "since": "3.1.0",
+      "evidence": "Set the Categorical to be ordered."
+     },
+     {
+      "trap": "Passing any argument to `Series.cat.remove_unused_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Call it with no arguments and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "Remove categories which are not used."
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series, and asserts on the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# The 3.1.0 signatures list only the parameters used below; the old args/kwargs parameters are gone.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories({\"z\": \"zz\"})\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\", \"zz\"]\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the `Series.cat` methods lost their args and kwargs parameters, so each method accepts only the parameters in its 3.1.0 signature. The excerpt lists no removed names or keyword arguments for the `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors.",
+    "traps": [
+     {
+      "trap": "Passing arguments beyond new_categories, ordered and rename to `Series.cat.set_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Passing arguments beyond new_categories and ordered to `Series.cat.reorder_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.rename_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories)"
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.add_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories)"
+     },
+     {
+      "trap": "Passing anything besides removals to `Series.cat.remove_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(removals)"
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods using only their 3.1.0 signatures, assigns each returned Series, and asserts on the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# The 3.1.0 signatures list only the parameters used below; the old args/kwargs parameters are gone.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories([\"c\", \"b\", \"a\", \"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\", \"zz\"]\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the `Series.cat` methods lost their args and kwargs parameters, so each method accepts only the parameters in its 3.1.0 signature. The excerpt lists no removed names or keyword arguments for the `Series.sparse`, `DataFrame.sparse` and `Series.plot` accessors.",
+    "traps": [
+     {
+      "trap": "Passing arguments other than new_categories, ordered and rename to `Series.cat.set_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories, ordered and rename, then assign the returned Series: s = s.cat.set_categories([...]).",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None, rename: 'bool' = False)"
+     },
+     {
+      "trap": "Passing arguments other than new_categories and ordered to `Series.cat.reorder_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass new_categories and, if needed, ordered=..., then assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories, ordered=None)"
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.rename_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories)"
+     },
+     {
+      "trap": "Passing anything besides new_categories to `Series.cat.add_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only new_categories and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(new_categories)"
+     },
+     {
+      "trap": "Passing anything besides removals to `Series.cat.remove_categories`, relying on the old args and kwargs parameters.",
+      "instead": "Pass only removals and assign the returned Series.",
+      "since": "3.1.0",
+      "evidence": "(removals)"
+     }
+    ],
+    "example": {
+     "explains": "Chains the `Series.cat` methods, passing only parameters that exist in their 3.1.0 signatures. It assigns each returned Series and asserts on the categories, codes and ordering.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"b\", \"a\", \"c\", \"a\"], dtype=\"category\")\n\n# Each call below uses only parameters present in its 3.1.0 signature.\n# set_categories also accepts ordered and rename; the old args/kwargs parameters are gone.\ns = s.cat.set_categories([\"a\", \"b\", \"c\", \"d\"])\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\", \"d\"]\n\ns = s.cat.remove_unused_categories()\nassert list(s.cat.categories) == [\"a\", \"b\", \"c\"]\n\ns = s.cat.add_categories([\"z\"])\ns = s.cat.reorder_categories([\"c\", \"b\", \"a\", \"z\"], ordered=True)\nassert s.cat.ordered\nassert list(s.cat.codes) == [1, 2, 0, 2]\n\ns = s.cat.rename_categories([\"c\", \"b\", \"a\", \"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\", \"zz\"]\ns = s.cat.remove_categories([\"zz\"])\nassert list(s.cat.categories) == [\"c\", \"b\", \"a\"]\n\ns = s.cat.as_unordered()\nassert not s.cat.ordered\ns = s.cat.as_ordered()\nassert s.cat.ordered\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

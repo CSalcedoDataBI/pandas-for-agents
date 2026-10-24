@@ -62,6 +62,12 @@ class CodeBlocks(unittest.TestCase):
     def test_foreign_module_ignored(self):
         self.assertEqual(self.block("import numpy as np\nx = np.arange(3)"), [])
 
+    def test_api_types_checked(self):
+        self.assertEqual(self.block("pd.api.types.is_integer_dtype(s)"), [])
+        self.assertEqual(len(self.block("pd.api.types.is_magic_dtype(s)")), 1)
+        self.assertEqual(errors("Use `pandas.api.types.is_float_dtype`."), [])
+        self.assertEqual(errors("The checks live in `pandas.api.types`."), [])
+
     def test_unparseable_block_fails(self):
         self.assertEqual(len(self.block("df.groupby(")), 1)
 

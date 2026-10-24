@@ -1480,6 +1480,422 @@
     }
    }
   },
+  "pandas.api.types": {
+   "class": "pandas.api.types",
+   "members": {
+    "CategoricalDtype": {
+     "kind": "class",
+     "summary": "Type for categorical data with the categories and orderedness.",
+     "signature": "(categories=None, ordered: 'Ordered' = False)",
+     "params": [
+      "categories",
+      "ordered"
+     ]
+    },
+    "DatetimeTZDtype": {
+     "kind": "class",
+     "summary": "An ExtensionDtype for timezone-aware datetime data.",
+     "signature": "(unit: 'TimeUnit | DatetimeTZDtype' = 'ns', tz=None)",
+     "params": [
+      "unit",
+      "tz"
+     ]
+    },
+    "IntervalDtype": {
+     "kind": "class",
+     "summary": "An ExtensionDtype for Interval data.",
+     "signature": "(subtype=None, closed: 'IntervalClosedType | None' = None)",
+     "params": [
+      "subtype",
+      "closed"
+     ]
+    },
+    "PeriodDtype": {
+     "kind": "class",
+     "summary": "An ExtensionDtype for Period data.",
+     "signature": "(freq)",
+     "params": [
+      "freq"
+     ]
+    },
+    "infer_dtype": {
+     "kind": "function",
+     "signature": "(value: 'object', skipna: 'bool' = True)",
+     "params": [
+      "value",
+      "skipna"
+     ],
+     "summary": "Return a string label of the type of the elements in a list-like input."
+    },
+    "is_any_real_numeric_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a real number dtype."
+    },
+    "is_array_like": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is array-like."
+    },
+    "is_bool": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Return True if given object is boolean."
+    },
+    "is_bool_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a boolean dtype."
+    },
+    "is_categorical_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the Categorical dtype.",
+     "deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Use isinstance(dtype, pd.CategoricalDtype) instead."
+      }
+     ]
+    },
+    "is_complex": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Return True if given object is complex."
+    },
+    "is_complex_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a complex dtype."
+    },
+    "is_datetime64_any_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of the datetime64 dtype."
+    },
+    "is_datetime64_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the datetime64 dtype."
+    },
+    "is_datetime64_ns_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of the datetime64[ns] dtype."
+    },
+    "is_datetime64tz_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of a DatetimeTZDtype dtype.",
+     "deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "Use isinstance(dtype, pd.DatetimeTZDtype) instead."
+      }
+     ]
+    },
+    "is_dict_like": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is dict-like."
+    },
+    "is_dtype_equal": {
+     "kind": "function",
+     "signature": "(source, target)",
+     "params": [
+      "source",
+      "target"
+     ],
+     "summary": "Check if two dtypes are equal."
+    },
+    "is_extension_array_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check if an object is a pandas extension array type."
+    },
+    "is_file_like": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is a file-like object."
+    },
+    "is_float": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Return True if given object is float."
+    },
+    "is_float_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a float dtype."
+    },
+    "is_hashable": {
+     "kind": "function",
+     "signature": "(obj: 'object', allow_slice: 'bool' = True)",
+     "params": [
+      "obj",
+      "allow_slice"
+     ],
+     "summary": "Return True if hash(obj) will succeed, False otherwise."
+    },
+    "is_int64_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of the int64 dtype.",
+     "deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "is_int64_dtype is deprecated and will be removed in a future version. Use dtype == np.int64 instead."
+      }
+     ]
+    },
+    "is_integer": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Return True if given object is integer."
+    },
+    "is_integer_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of an integer dtype."
+    },
+    "is_interval_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the Interval dtype.",
+     "deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Use isinstance(dtype, pd.IntervalDtype) instead."
+      }
+     ]
+    },
+    "is_iterator": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is an iterator."
+    },
+    "is_list_like": {
+     "kind": "function",
+     "signature": "(obj: 'object', allow_sets: 'bool' = True)",
+     "params": [
+      "obj",
+      "allow_sets"
+     ],
+     "summary": "Check if the object is list-like."
+    },
+    "is_named_tuple": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is a named tuple."
+    },
+    "is_number": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is a number."
+    },
+    "is_numeric_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a numeric dtype."
+    },
+    "is_object_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the object dtype."
+    },
+    "is_period_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the Period dtype.",
+     "deprecated": [
+      {
+       "version": "2.2.0",
+       "target": "member",
+       "note": "Use isinstance(dtype, pd.PeriodDtype) instead."
+      }
+     ]
+    },
+    "is_re": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object is a regex pattern instance."
+    },
+    "is_re_compilable": {
+     "kind": "function",
+     "signature": "(obj: 'object')",
+     "params": [
+      "obj"
+     ],
+     "summary": "Check if the object can be compiled into a regex pattern instance."
+    },
+    "is_scalar": {
+     "kind": "function",
+     "signature": "(val: 'object')",
+     "params": [
+      "val"
+     ],
+     "summary": "Return True if given object is scalar."
+    },
+    "is_signed_integer_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of a signed integer dtype."
+    },
+    "is_sparse": {
+     "kind": "function",
+     "signature": "(arr)",
+     "params": [
+      "arr"
+     ],
+     "summary": "Check whether an array-like is a 1-D pandas sparse array.",
+     "deprecated": [
+      {
+       "version": "2.1.0",
+       "target": "member",
+       "note": "Use isinstance(dtype, pd.SparseDtype) instead."
+      }
+     ]
+    },
+    "is_string_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of the string dtype."
+    },
+    "is_timedelta64_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether an array-like or dtype is of the timedelta64 dtype."
+    },
+    "is_timedelta64_ns_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of the timedelta64[ns] dtype."
+    },
+    "is_unsigned_integer_dtype": {
+     "kind": "function",
+     "signature": "(arr_or_dtype)",
+     "params": [
+      "arr_or_dtype"
+     ],
+     "summary": "Check whether the provided array or dtype is of an unsigned integer dtype."
+    },
+    "pandas_dtype": {
+     "kind": "function",
+     "signature": "(dtype)",
+     "params": [
+      "dtype"
+     ],
+     "summary": "Convert input into a pandas only dtype object or a numpy dtype object."
+    },
+    "union_categoricals": {
+     "kind": "function",
+     "signature": "(to_union: 'Sequence[CategoricalIndex | Series | Categorical]', sort_categories: 'bool' = False, ignore_order: 'bool' = False)",
+     "params": [
+      "to_union",
+      "sort_categories",
+      "ignore_order"
+     ],
+     "summary": "Combine list-like of Categorical-like, unioning categories."
+    }
+   }
+  },
   "DataFrame": {
    "class": "pandas.DataFrame",
    "members": {

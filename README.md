@@ -20,10 +20,15 @@ rule: **an agent never reads a function name that did not come from the engine.*
 
 | Piece | Source | Status |
 |---|---|---|
-| API catalogue (JSON, one per pandas version) | introspection of the installed `pandas` package | planned |
-| Deprecated / removed flags (2.x → current) | the docstrings' `deprecated` notes, and the diff between two catalogues | planned |
-| Traps and examples per group | notes written per group, every name checked against the catalogue | planned |
-| `pandas-feedback` skill | report a wrong or missing card as a public issue | planned |
+| API catalogue (`catalog/pandas-<version>.json`) | introspection of the installed `pandas` package, re-exported in CI | first version |
+| Deprecated / removed flags (`catalog/changes-*.json`) | the docstrings' `deprecated` notes, and the diff between the last 2.x and the current catalogue | first version |
+| Trap cards with examples (`skills/pandas-reference/traps/`) | drafted per group from the catalogue; every name, every quote and every example checked by script | first version |
+| `pandas-reference` skill | points an agent to the cards, the change list and the catalogue | first version |
+| `pandas-feedback` skill and the plugin manifest | report a wrong or missing card as a public issue | planned |
+
+How the cards are checked: every pandas name must be in the catalogue (`scripts/check_names.py`,
+in CI), every trap quotes the catalogue text that proves it, and every example runs on the current
+pandas with every warning turned into an error. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Not in scope
 

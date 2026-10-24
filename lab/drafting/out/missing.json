@@ -1,0 +1,118 @@
+{
+ "batch": "missing",
+ "title": "DataFrame and Series: missing data, fill and replace",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "In 3.1.0 the removed `DataFrame.pad`, `DataFrame.backfill`, `Series.pad` and `Series.backfill` are gone, as are the method keyword of `DataFrame.fillna`, the downcast keyword of the fill and interpolate methods, and the method and limit keywords of `DataFrame.replace`. Use `DataFrame.ffill` and `DataFrame.bfill` for directional fills and assign results instead of relying on the inplace keyword of `DataFrame.dropna`, which is newly deprecated in 3.1.0.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrame.pad` or `Series.pad` to forward-fill missing values.",
+      "instead": "Call `DataFrame.ffill` or `Series.ffill`.",
+      "since": "2.0",
+      "evidence": "Series/DataFrame.pad is deprecated. Use Series/DataFrame.ffill instead."
+     },
+     {
+      "trap": "Calling `DataFrame.backfill` or `Series.backfill` to back-fill missing values.",
+      "instead": "Call `DataFrame.bfill` or `Series.bfill`.",
+      "since": "2.0",
+      "evidence": "Series/DataFrame.backfill is deprecated. Use Series/DataFrame.bfill instead."
+     },
+     {
+      "trap": "Passing the method keyword to `DataFrame.fillna` or `Series.fillna` with 'ffill' or 'bfill'.",
+      "instead": "Call `DataFrame.ffill` or `DataFrame.bfill` directly. Keep `DataFrame.fillna` for constant or mapping values only.",
+      "since": "2.1.0",
+      "evidence": "Use ffill or bfill instead."
+     },
+     {
+      "trap": "Passing the downcast keyword to `DataFrame.fillna`, `DataFrame.ffill` or `DataFrame.bfill`, or to the matching `Series` methods.",
+      "instead": "Drop the keyword. If you need a different dtype, convert the result explicitly afterwards.",
+      "since": "2.2.0",
+      "evidence": "(axis: 'Axis | None' = None, inplace: 'bool' = False, limit: 'int | None' = None, limit_area: \"Literal['inside', 'outside'] | None\" = None)"
+     },
+     {
+      "trap": "Passing the downcast keyword to `DataFrame.interpolate` or `Series.interpolate`.",
+      "instead": "Call `DataFrame.interpolate` without it, using method, limit, limit_direction and limit_area only.",
+      "since": "2.1.0",
+      "evidence": "(method: 'InterpolateOptions' = 'linear', axis: 'Axis' = 0, limit: 'int | None' = None, inplace: 'bool' = False"
+     },
+     {
+      "trap": "Passing the method or limit keywords to `DataFrame.replace` or `Series.replace` to pad replaced values.",
+      "instead": "Call `DataFrame.replace` with to_replace and value (or a mapping) only. For directional filling, use `DataFrame.ffill` or `DataFrame.bfill` with its limit.",
+      "since": "2.1.0",
+      "evidence": "(to_replace=None, value=<no_default>, inplace: 'bool' = False, regex: 'bool' = False)"
+     },
+     {
+      "trap": "Passing inplace=True to `DataFrame.dropna` or `Series.dropna`, which now emits a deprecation warning.",
+      "instead": "Assign the returned object, for example df = df.dropna().",
+      "since": "3.1.0",
+      "evidence": "This keyword is deprecated and will be removed in pandas 4.0."
+     }
+    ],
+    "example": {
+     "explains": "Forward and backward fills via `DataFrame.ffill` and `DataFrame.bfill`, constant fills via `DataFrame.fillna`, `Series.interpolate`, `Series.replace` and `DataFrame.dropna` with assignment, all without removed names or keywords.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1.0, np.nan, np.nan, 4.0], \"b\": [np.nan, 2.0, np.nan, 8.0]})\n\n# forward fill: use ffill (old pad method and fillna method keyword are removed)\nfwd = df.ffill()\nassert list(fwd[\"a\"]) == [1.0, 1.0, 1.0, 4.0]\nassert list(fwd[\"b\"].isna()) == [True, False, False, False]\n\n# limit still works on ffill\nlimited = df[\"a\"].ffill(limit=1)\nassert list(limited.isna()) == [False, False, True, False]\n\n# backward fill: use bfill (old backfill method is removed)\nback = df.bfill()\nassert list(back[\"a\"]) == [1.0, 4.0, 4.0, 4.0]\nassert list(back[\"b\"]) == [2.0, 2.0, 8.0, 8.0]\n\n# constant fill per column, no downcast keyword\nconst = df.fillna({\"a\": 0.0, \"b\": -1.0})\nassert list(const[\"a\"]) == [1.0, 0.0, 0.0, 4.0]\nassert list(const[\"b\"]) == [-1.0, 2.0, -1.0, 8.0]\n\n# linear interpolation, no downcast keyword\ninterp = df[\"a\"].interpolate()\nassert list(interp) == [1.0, 2.0, 3.0, 4.0]\n\n# replace with a mapping, no method or limit keywords\ns = pd.Series([1, 2, 3])\nassert list(s.replace({2: 20})) == [1, 20, 3]\n\n# dropna: assign the result instead of passing inplace\ncleaned = df.dropna(ignore_index=True)\nassert list(cleaned[\"a\"]) == [4.0]\nassert list(cleaned[\"b\"]) == [8.0]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "In 3.1.0 the removed `DataFrame.pad`, `DataFrame.backfill`, `Series.pad` and `Series.backfill` are gone, as are the method keyword of `DataFrame.fillna`, the downcast keyword of the fill and interpolate methods, and the method and limit keywords of `DataFrame.replace`. Use `DataFrame.ffill` and `DataFrame.bfill` for directional fills, and assign results instead of passing the inplace keyword of `DataFrame.dropna`, which is newly deprecated in 3.1.0.",
+    "traps": [
+     {
+      "trap": "Calling `DataFrame.pad` or `Series.pad` to forward-fill missing values.",
+      "instead": "Call `DataFrame.ffill` or `Series.ffill`.",
+      "since": "2.0",
+      "evidence": "Series/DataFrame.pad is deprecated. Use Series/DataFrame.ffill instead."
+     },
+     {
+      "trap": "Calling `DataFrame.backfill` or `Series.backfill` to back-fill missing values.",
+      "instead": "Call `DataFrame.bfill` or `Series.bfill`.",
+      "since": "2.0",
+      "evidence": "Series/DataFrame.backfill is deprecated. Use Series/DataFrame.bfill instead."
+     },
+     {
+      "trap": "Passing the method keyword to `DataFrame.fillna` or `Series.fillna` with 'ffill' or 'bfill'.",
+      "instead": "Call `DataFrame.ffill` or `DataFrame.bfill` directly. Keep `DataFrame.fillna` for constant or mapping values.",
+      "since": "2.1.0",
+      "evidence": "Use ffill or bfill instead."
+     },
+     {
+      "trap": "Passing the downcast keyword to `DataFrame.fillna`, `DataFrame.ffill` or `DataFrame.bfill`, or to the matching `Series` methods.",
+      "instead": "Drop the downcast keyword. If you need a different dtype, convert the result explicitly afterwards.",
+      "since": "2.2.0",
+      "evidence": "(axis: 'Axis | None' = None, inplace: 'bool' = False, limit: 'int | None' = None, limit_area: \"Literal['inside', 'outside'] | None\" = None)"
+     },
+     {
+      "trap": "Passing the downcast keyword to `DataFrame.interpolate` or `Series.interpolate`.",
+      "instead": "Drop the downcast keyword. The other keywords in the signature, including method-specific options passed through **kwargs, still work.",
+      "since": "2.1.0",
+      "evidence": "(method: 'InterpolateOptions' = 'linear', axis: 'Axis' = 0, limit: 'int | None' = None, inplace: 'bool' = False"
+     },
+     {
+      "trap": "Passing the method or limit keywords to `DataFrame.replace` or `Series.replace` to pad replaced values.",
+      "instead": "Drop the method and limit keywords. The remaining keywords (to_replace, value, regex, inplace) still work. For directional filling, use `DataFrame.ffill` or `DataFrame.bfill` with their limit keyword.",
+      "since": "2.1.0",
+      "evidence": "(to_replace=None, value=<no_default>, inplace: 'bool' = False, regex: 'bool' = False)"
+     },
+     {
+      "trap": "Passing inplace=True to `DataFrame.dropna` or `Series.dropna`, which now emits a deprecation warning.",
+      "instead": "Assign the returned object, for example df = df.dropna().",
+      "since": "3.1.0",
+      "evidence": "This keyword is deprecated and will be removed in pandas 4.0."
+     }
+    ],
+    "example": {
+     "explains": "Forward and backward fills via `DataFrame.ffill` and `DataFrame.bfill`, constant fills via `DataFrame.fillna`, `Series.interpolate`, `Series.replace` with regex, and `DataFrame.dropna` with assignment, all without removed names or keywords.",
+     "code": "import numpy as np\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1.0, np.nan, np.nan, 4.0], \"b\": [np.nan, 2.0, np.nan, 8.0]})\n\n# forward fill: use ffill\nfwd = df.ffill()\nassert list(fwd[\"a\"]) == [1.0, 1.0, 1.0, 4.0]\nassert list(fwd[\"b\"].isna()) == [True, False, False, False]\n\n# limit still works on ffill\nlimited = df[\"a\"].ffill(limit=1)\nassert list(limited.isna()) == [False, False, True, False]\n\n# backward fill: use bfill\nback = df.bfill()\nassert list(back[\"a\"]) == [1.0, 4.0, 4.0, 4.0]\nassert list(back[\"b\"]) == [2.0, 2.0, 8.0, 8.0]\n\n# constant fill per column\nconst = df.fillna({\"a\": 0.0, \"b\": -1.0})\nassert list(const[\"a\"]) == [1.0, 0.0, 0.0, 4.0]\nassert list(const[\"b\"]) == [-1.0, 2.0, -1.0, 8.0]\n\n# linear interpolation\ninterp = df[\"a\"].interpolate()\nassert list(interp) == [1.0, 2.0, 3.0, 4.0]\n\n# replace with a mapping\ns = pd.Series([1, 2, 3])\nassert list(s.replace({2: 20})) == [1, 20, 3]\n\n# replace with regex still works\nt = pd.Series([\"x1\", \"y2\", \"x3\"])\nassert list(t.replace(r\"^x\", \"z\", regex=True)) == [\"z1\", \"y2\", \"z3\"]\n\n# dropna: assign the result\ncleaned = df.dropna(ignore_index=True)\nassert list(cleaned[\"a\"]) == [4.0]\nassert list(cleaned[\"b\"]) == [8.0]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

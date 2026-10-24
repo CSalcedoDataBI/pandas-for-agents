@@ -1,0 +1,101 @@
+{
+ "batch": "reshape-top",
+ "title": "Top-level merge, concat and reshape",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "In 3.1.0 the top-level `pd.value_counts` function is gone; the merge, concat and reshape functions remain. Since 3.0.0 the `copy` keyword of `pd.concat` and `pd.merge` is ignored and deprecated, because results always use Copy-on-Write lazy copies.",
+    "traps": [
+     {
+      "trap": "Calling the top-level `pd.value_counts` function to count values; it was removed in 3.1.0.",
+      "instead": "Encode the values with `pd.factorize`, drop the missing-value code (-1), and count the codes with `np.bincount`. Pair the counts with the returned uniques.",
+      "since": "3.1.0",
+      "evidence": "(values, sort: 'bool' = True, ascending: 'bool' = False, normalize: 'bool' = False, bins=None, dropna: 'bool' = True)"
+     },
+     {
+      "trap": "Passing `copy=False` (or `copy=True`) to `pd.concat` to control memory use; the keyword is ignored and raises a deprecation warning.",
+      "instead": "Omit `copy` from `pd.concat`. Copy-on-Write already defers copies until they are needed.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0."
+     },
+     {
+      "trap": "Passing `copy=False` to `pd.merge` and expecting the result to share memory with, or write back into, the inputs.",
+      "instead": "Omit `copy` from `pd.merge`. Treat the merged frame as an independent new object; changing it never changes `left` or `right`.",
+      "since": "3.0.0",
+      "evidence": "Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write)."
+     }
+    ],
+    "example": {
+     "explains": "Merges and concatenates without the deprecated `copy` keyword, shows that Copy-on-Write keeps the input unchanged, and counts values with `pd.factorize` in place of the removed top-level value counting function.",
+     "code": "import numpy as np\nimport pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"x\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"y\": [10, 20, 40]})\n\n# Old code passed copy=False here; the keyword is ignored since 3.0, so omit it.\nmerged = pd.merge(left, right, on=\"key\", how=\"inner\", validate=\"one_to_one\")\nassert list(merged[\"key\"]) == [\"a\", \"b\"]\nassert list(merged[\"y\"]) == [10, 20]\n\n# Copy-on-Write: changing the result never changes the input.\nmerged[\"x\"] = merged[\"x\"] * 100\nassert list(merged[\"x\"]) == [100, 200]\nassert list(left[\"x\"]) == [1, 2, 3]\n\n# Concatenate without the copy keyword.\nmore = pd.DataFrame({\"key\": [\"e\"], \"x\": [5]})\nstacked = pd.concat([left, more], ignore_index=True)\nassert list(stacked[\"key\"]) == [\"a\", \"b\", \"c\", \"e\"]\nassert len(stacked) == 4\n\n# Counting values without the removed top-level counting function.\nvalues = pd.Series([\"a\", \"b\", \"a\", None, \"a\"])\ncodes, uniques = pd.factorize(values)\ncounts = np.bincount(codes[codes >= 0])\nresult = dict(zip(uniques, counts))\nassert result == {\"a\": 3, \"b\": 1}\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the top-level `pd.value_counts` function was removed (it is absent in 3.1.0), while the merge, concat and reshape functions remain. Since 3.0.0 the `copy` keyword of `pd.concat` and `pd.merge` is deprecated and ignored, because these functions always return a new object that uses lazy Copy-on-Write copies.",
+    "traps": [
+     {
+      "trap": "Calling the top-level `pd.value_counts` function to count values. It does not exist in 3.1.0 because it was removed after 2.3.3.",
+      "instead": "Encode the values with `pd.factorize`, drop the missing-value code (-1), count the codes with `np.bincount`, and pair the counts with the returned uniques.",
+      "since": "3.1.0",
+      "evidence": "(values, sort: 'bool' = True, ascending: 'bool' = False, normalize: 'bool' = False, bins=None, dropna: 'bool' = True)"
+     },
+     {
+      "trap": "Passing `copy=False` or `copy=True` to `pd.concat` to control memory use. Since 3.0.0 the keyword is deprecated and ignored, and it is scheduled for removal in pandas 4.0.",
+      "instead": "Omit `copy` from `pd.concat`. Copy-on-Write already defers copies until they are needed.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0."
+     },
+     {
+      "trap": "Passing `copy=False` to `pd.merge` and expecting the result to share memory with the inputs, or to write back into them.",
+      "instead": "Omit `copy` from `pd.merge`. Treat the merged frame as a new object: modifying it in place never changes `left` or `right`.",
+      "since": "3.0.0",
+      "evidence": "Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write)."
+     }
+    ],
+    "example": {
+     "explains": "Calls `pd.merge` and `pd.concat` without the deprecated `copy` keyword. It modifies each result in place with `.loc` and asserts that the input is unchanged. It also counts values with `pd.factorize` and `np.bincount` instead of the removed top-level value counting function.",
+     "code": "import numpy as np\nimport pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"x\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"y\": [10, 20, 40]})\n\n# Old code passed a copy keyword here; it is ignored since 3.0, so omit it.\nmerged = pd.merge(left, right, on=\"key\", how=\"inner\", validate=\"one_to_one\")\nassert list(merged[\"key\"]) == [\"a\", \"b\"]\nassert list(merged[\"y\"]) == [10, 20]\n\n# In-place change of the result does not reach the input (Copy-on-Write).\nmerged.loc[0, \"x\"] = 100\nassert list(merged[\"x\"]) == [100, 2]\nassert list(left[\"x\"]) == [1, 2, 3]\n\n# Concatenate without the copy keyword.\nmore = pd.DataFrame({\"key\": [\"e\"], \"x\": [5]})\nstacked = pd.concat([left, more], ignore_index=True)\nassert list(stacked[\"key\"]) == [\"a\", \"b\", \"c\", \"e\"]\nstacked.loc[0, \"x\"] = -1\nassert list(stacked[\"x\"]) == [-1, 2, 3, 5]\nassert list(left[\"x\"]) == [1, 2, 3]\n\n# Count values without the removed top-level counting function.\nvalues = pd.Series([\"a\", \"b\", \"a\", None, \"a\"])\ncodes, uniques = pd.factorize(values)\ncounts = np.bincount(codes[codes >= 0])\nresult = {str(k): int(v) for k, v in zip(uniques, counts)}\nassert result == {\"a\": 3, \"b\": 1}\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "The top-level `pd.value_counts` function present in 2.3.3 is gone in 3.1.0. Use `Series.value_counts` instead, which takes the same counting options. Since 3.0.0 the `copy` keyword of `pd.concat` and `pd.merge` is deprecated and ignored, because these functions always return a new object that uses lazy Copy-on-Write copies.",
+    "traps": [
+     {
+      "trap": "Calling the top-level `pd.value_counts` function to count values. It is absent in 3.1.0.",
+      "instead": "Wrap the values in a Series and call `Series.value_counts`. It accepts the same `normalize`, `sort`, `ascending`, `bins` and `dropna` arguments and returns counts sorted in descending order.",
+      "since": "3.1.0",
+      "evidence": "(values, sort: 'bool' = True, ascending: 'bool' = False, normalize: 'bool' = False, bins=None, dropna: 'bool' = True)"
+     },
+     {
+      "trap": "Passing `copy=False` or `copy=True` to `pd.concat` to control memory use. Since 3.0.0 the keyword is deprecated and ignored, and it is scheduled for removal in pandas 4.0.",
+      "instead": "Omit `copy` from `pd.concat`. Copy-on-Write already defers copies until they are needed.",
+      "since": "3.0.0",
+      "evidence": "This keyword is ignored and will be removed in pandas 4.0."
+     },
+     {
+      "trap": "Passing `copy=False` to `pd.merge` and expecting the result to share memory with the inputs, or to write back into them.",
+      "instead": "Omit `copy` from `pd.merge`. Treat the merged frame as a new object: modifying it in place never changes `left` or `right`.",
+      "since": "3.0.0",
+      "evidence": "Since pandas 3.0, this method always returns a new object using a lazy copy mechanism that defers copies until necessary (Copy-on-Write)."
+     }
+    ],
+    "example": {
+     "explains": "Calls `pd.merge` and `pd.concat` without the deprecated `copy` keyword. It modifies each result in place with `.loc` and asserts that the inputs are unchanged. It also counts values with `Series.value_counts` in place of the removed top-level counting function, using the `normalize` and `dropna` options.",
+     "code": "import pandas as pd\n\nleft = pd.DataFrame({\"key\": [\"a\", \"b\", \"c\"], \"x\": [1, 2, 3]})\nright = pd.DataFrame({\"key\": [\"a\", \"b\", \"d\"], \"y\": [10, 20, 40]})\n\n# Old code passed a copy keyword here; it is ignored since 3.0, so omit it.\nmerged = pd.merge(left, right, on=\"key\", how=\"inner\", validate=\"one_to_one\")\nassert list(merged[\"key\"]) == [\"a\", \"b\"]\nassert list(merged[\"y\"]) == [10, 20]\n\n# In-place change of the result does not reach the input (Copy-on-Write).\nmerged.loc[0, \"x\"] = 100\nassert list(merged[\"x\"]) == [100, 2]\nassert list(left[\"x\"]) == [1, 2, 3]\n\n# Concatenate without the copy keyword.\nmore = pd.DataFrame({\"key\": [\"e\"], \"x\": [5]})\nstacked = pd.concat([left, more], ignore_index=True)\nassert list(stacked[\"key\"]) == [\"a\", \"b\", \"c\", \"e\"]\nstacked.loc[0, \"x\"] = -1\nassert list(stacked[\"x\"]) == [-1, 2, 3, 5]\nassert list(left[\"x\"]) == [1, 2, 3]\n\n# Count values with the Series method (the top-level function is gone).\nvalues = pd.Series([\"a\", \"b\", \"a\", None, \"a\"])\ncounts = values.value_counts()\nassert list(counts.index) == [\"a\", \"b\"]\nassert list(counts) == [3, 1]\n\nshares = values.value_counts(normalize=True)\nassert list(shares) == [0.75, 0.25]\n\nwith_missing = values.value_counts(dropna=False)\nassert int(with_missing.sum()) == 5\nassert len(with_missing) == 3\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

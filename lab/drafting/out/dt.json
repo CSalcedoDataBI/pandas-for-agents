@@ -1,0 +1,100 @@
+{
+ "batch": "dt",
+ "title": "The .dt accessor",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 no `.dt` member was removed, but the catch-all *args/**kwargs were removed from methods such as `Series.dt.round`, `Series.dt.tz_localize`, `Series.dt.strftime` and `Series.dt.to_timestamp`, so they accept only their named parameters. In 3.1.0 the legacy aliases `Series.dt.dayofweek`, `Series.dt.weekday`, `Series.dt.dayofyear` and `Series.dt.daysinmonth` are deprecated, and `Series.dt.freq` warns that it will return an offset object instead of a string.",
+    "traps": [
+     {
+      "trap": "Using `Series.dt.dayofweek` or `Series.dt.weekday` for the weekday number (Monday=0).",
+      "instead": "Use `Series.dt.day_of_week`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.day_of_week` instead."
+     },
+     {
+      "trap": "Using `Series.dt.dayofyear` for the ordinal day.",
+      "instead": "Use `Series.dt.day_of_year`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.day_of_year` instead."
+     },
+     {
+      "trap": "Using `Series.dt.daysinmonth` for the month length.",
+      "instead": "Use `Series.dt.days_in_month`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.days_in_month` instead."
+     },
+     {
+      "trap": "Reading `Series.dt.freq` and treating the result as a string. Accessing it now emits a deprecation warning.",
+      "instead": "Do not depend on `Series.dt.freq` returning a string. Opt in to the offset-returning behavior with the future.infer_freq_returns_offset option and handle an offset or None.",
+      "since": "3.1.0",
+      "evidence": "A future version of pandas will return a :class:`BaseOffset` object (or ``None``) instead of a string."
+     },
+     {
+      "trap": "Passing extra positional or keyword arguments to `Series.dt.round`, `Series.dt.floor` or `Series.dt.ceil`. The swallowed *args/**kwargs are gone.",
+      "instead": "Pass only freq, ambiguous and nonexistent.",
+      "since": "3.1.0",
+      "evidence": "(freq, ambiguous: 'TimeAmbiguous' = 'raise', nonexistent: 'TimeNonexistent' = 'raise')"
+     },
+     {
+      "trap": "Passing unlisted extra arguments to `Series.dt.tz_localize` or `Series.dt.tz_convert`.",
+      "instead": "Call `Series.dt.tz_localize` with only tz, ambiguous and nonexistent, and call `Series.dt.tz_convert` with only tz.",
+      "since": "3.1.0",
+      "evidence": "(tz, ambiguous: 'TimeAmbiguous' = 'raise', nonexistent: 'TimeNonexistent' = 'raise')"
+     },
+     {
+      "trap": "Passing extra arguments to the period methods `Series.dt.to_timestamp` or `Series.dt.asfreq`.",
+      "instead": "Pass only freq and how.",
+      "since": "3.1.0",
+      "evidence": "(freq=None, how: 'str' = 'start')"
+     }
+    ],
+    "example": {
+     "explains": "Uses the current names `Series.dt.day_of_week`, `Series.dt.day_of_year` and `Series.dt.days_in_month`, and calls `Series.dt.round`, `Series.dt.floor`, `Series.dt.day_name` and `Series.dt.total_seconds` with only their named parameters. The asserts check each result.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"2024-02-28 10:40:00\", \"2024-02-29 23:10:00\", \"2024-03-03 08:05:00\"], dtype=\"datetime64[ns]\")\n\n# old aliases dayofweek / weekday / dayofyear / daysinmonth are deprecated in 3.1.0\nassert list(s.dt.day_of_week) == [2, 3, 6]\nassert list(s.dt.day_of_year) == [59, 60, 63]\nassert list(s.dt.days_in_month) == [29, 29, 31]\n\n# round/floor accept only freq, ambiguous, nonexistent (no extra *args/**kwargs)\nrounded = s.dt.round(\"h\", ambiguous=\"raise\", nonexistent=\"raise\")\nassert list(rounded.dt.hour) == [11, 23, 8]\nfloored = s.dt.floor(\"D\")\nassert list(floored.dt.day) == [28, 29, 3]\nassert list(floored.dt.hour) == [0, 0, 0]\n\nassert list(s.dt.day_name(locale=None)) == [\"Wednesday\", \"Thursday\", \"Sunday\"]\n\ntd = pd.Series([\"1 days 02:30:00\", \"0 days 00:00:45\"], dtype=\"timedelta64[ns]\")\nassert list(td.dt.total_seconds()) == [95400.0, 45.0]\nassert list(td.dt.days) == [1, 0]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 no `.dt` member was removed, but the catch-all *args/**kwargs were removed from methods such as `Series.dt.round`, `Series.dt.tz_localize`, `Series.dt.strftime` and `Series.dt.to_timestamp`, so they accept only their named parameters. In 3.1.0 the legacy aliases `Series.dt.dayofweek`, `Series.dt.weekday`, `Series.dt.dayofyear` and `Series.dt.daysinmonth` are deprecated, and on datetime and timedelta Series `Series.dt.freq` is deprecated because it will return an offset object instead of a string.",
+    "traps": [
+     {
+      "trap": "Using `Series.dt.dayofweek` or `Series.dt.weekday` for the weekday number (Monday=0).",
+      "instead": "Use `Series.dt.day_of_week`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.day_of_week` instead."
+     },
+     {
+      "trap": "Using `Series.dt.dayofyear` for the ordinal day.",
+      "instead": "Use `Series.dt.day_of_year`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.day_of_year` instead."
+     },
+     {
+      "trap": "Using `Series.dt.daysinmonth` for the month length.",
+      "instead": "Use `Series.dt.days_in_month`.",
+      "since": "3.1.0",
+      "evidence": "Use :attr:`Series.dt.days_in_month` instead."
+     },
+     {
+      "trap": "On a datetime or timedelta Series, reading `Series.dt.freq` and treating the result as a string. This member is deprecated for those dtypes. On a period Series, `Series.dt.freq` is not deprecated and already returns the frequency object.",
+      "instead": "For datetime and timedelta Series, do not depend on `Series.dt.freq` returning a string. Opt in to the future behavior with the future.infer_freq_returns_offset option and handle an offset or None.",
+      "since": "3.1.0",
+      "evidence": "A future version of pandas will return a :class:`BaseOffset` object (or ``None``) instead of a string."
+     }
+    ],
+    "example": {
+     "explains": "Uses the current names `Series.dt.day_of_week`, `Series.dt.day_of_year` and `Series.dt.days_in_month`, and calls `Series.dt.round`, `Series.dt.floor`, `Series.dt.day_name` and `Series.dt.total_seconds` with only their named parameters. The asserts check each result.",
+     "code": "import pandas as pd\n\ns = pd.Series([\"2024-02-28 10:40:00\", \"2024-02-29 23:10:00\", \"2024-03-03 08:05:00\"], dtype=\"datetime64[ns]\")\n\n# old aliases dayofweek / weekday / dayofyear / daysinmonth are deprecated in 3.1.0\nassert list(s.dt.day_of_week) == [2, 3, 6]\nassert list(s.dt.day_of_year) == [59, 60, 63]\nassert list(s.dt.days_in_month) == [29, 29, 31]\n\n# round/floor accept only freq, ambiguous, nonexistent (no extra *args/**kwargs)\nrounded = s.dt.round(\"h\", ambiguous=\"raise\", nonexistent=\"raise\")\nassert list(rounded.dt.hour) == [11, 23, 8]\nfloored = s.dt.floor(\"D\")\nassert list(floored.dt.day) == [28, 29, 3]\nassert list(floored.dt.hour) == [0, 0, 0]\n\nassert list(s.dt.day_name(locale=None)) == [\"Wednesday\", \"Thursday\", \"Sunday\"]\n\ntd = pd.Series([\"1 days 02:30:00\", \"0 days 00:00:45\"], dtype=\"timedelta64[ns]\")\nassert list(td.dt.total_seconds()) == [95400.0, 45.0]\nassert list(td.dt.days) == [1, 0]\n\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

@@ -324,6 +324,57 @@
     ]
    }
   },
+  "pandas.api.types": {
+   "removed": {
+    "is_interval": {}
+   },
+   "removed_params": {},
+   "added": [],
+   "deprecated": {
+    "is_categorical_dtype": [
+     {
+      "version": "2.2.0",
+      "target": "member",
+      "note": "Use isinstance(dtype, pd.CategoricalDtype) instead."
+     }
+    ],
+    "is_datetime64tz_dtype": [
+     {
+      "version": "2.1.0",
+      "target": "member",
+      "note": "Use isinstance(dtype, pd.DatetimeTZDtype) instead."
+     }
+    ],
+    "is_int64_dtype": [
+     {
+      "version": "2.1.0",
+      "target": "member",
+      "note": "is_int64_dtype is deprecated and will be removed in a future version. Use dtype == np.int64 instead."
+     }
+    ],
+    "is_interval_dtype": [
+     {
+      "version": "2.2.0",
+      "target": "member",
+      "note": "Use isinstance(dtype, pd.IntervalDtype) instead."
+     }
+    ],
+    "is_period_dtype": [
+     {
+      "version": "2.2.0",
+      "target": "member",
+      "note": "Use isinstance(dtype, pd.PeriodDtype) instead."
+     }
+    ],
+    "is_sparse": [
+     {
+      "version": "2.1.0",
+      "target": "member",
+      "note": "Use isinstance(dtype, pd.SparseDtype) instead."
+     }
+    ]
+   }
+  },
   "DataFrame": {
    "removed": {
     "applymap": {

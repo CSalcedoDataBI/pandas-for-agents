@@ -1,0 +1,161 @@
+{
+ "batch": "str",
+ "title": "The .str accessor",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "The only removal for the `.str` accessor in 3.1.0 is the kwargs catch-all on `Series.str.wrap`, so textwrap options must be passed as the named keyword arguments in its signature. Every other `Series.str` method remains, but the 3.1.0 signatures use explicit defaults (na=<no_default> on `Series.str.contains` and `Series.str.startswith`, regex=False on `Series.str.replace`, regex=None on `Series.str.split`), so code should pass these keywords explicitly instead of relying on old implicit behaviour.",
+    "traps": [
+     {
+      "trap": "Passing arbitrary extra keyword arguments through `Series.str.wrap` to textwrap, relying on its old kwargs catch-all.",
+      "instead": "Pass only the named parameters listed in the `Series.str.wrap` signature (width, break_long_words, max_lines, placeholder and the others). Any other keyword fails because the kwargs parameter is removed.",
+      "since": "3.1.0",
+      "evidence": "expand_tabs: 'bool' = True, tabsize: 'int' = 8, replace_whitespace: 'bool' = True"
+     },
+     {
+      "trap": "Calling `Series.str.replace` with a regex pattern and expecting it to be treated as a regex by default.",
+      "instead": "Pass regex=True whenever pat is a regular expression. With the default regex=False, pat is matched as a literal string, so '.' only replaces a real dot.",
+      "since": "3.1.0",
+      "evidence": "case: 'bool | None' = None, flags: 'int' = 0, regex: 'bool' = False"
+     },
+     {
+      "trap": "Using the mask from `Series.str.contains` on data with missing values without setting na, then indexing with it.",
+      "instead": "Pass na=False (or na=True) explicitly so the result is a plain boolean mask that is safe to use for filtering.",
+      "since": "3.1.0",
+      "evidence": "flags: 'int' = 0, na=<no_default>, regex: 'bool' = True"
+     },
+     {
+      "trap": "Assuming `Series.str.startswith` and `Series.str.endswith` return NaN for missing values and accept only a single prefix.",
+      "instead": "Pass na=False explicitly for a clean boolean mask. To test several prefixes or suffixes, pass a tuple of strings.",
+      "since": "3.1.0",
+      "evidence": "na: 'Scalar | lib.NoDefault' = <no_default>"
+     },
+     {
+      "trap": "Calling `Series.str.split` with a multi-character regex pattern and leaving the regex keyword unset.",
+      "instead": "Pass regex=True for a regex pattern, or regex=False for a literal separator, so the result does not depend on how pandas guesses from the pattern.",
+      "since": "3.1.0",
+      "evidence": "expand: 'bool' = False, regex: 'bool | None' = None"
+     },
+     {
+      "trap": "Using `Series.str.match` to validate that a whole string fits a pattern.",
+      "instead": "Use `Series.str.fullmatch` to check the whole string. `Series.str.match` is anchored only at the start, so trailing characters still match.",
+      "since": "3.1.0",
+      "evidence": "Determine if each string starts with a match of a regular expression."
+     },
+     {
+      "trap": "Calling `Series.str.cat` on Series with different indexes and expecting a positional concatenation without missing parts.",
+      "instead": "Remember that others are aligned on the index with a left join. Pass join explicitly, and pass na_rep so unmatched rows are not turned into missing values.",
+      "since": "3.1.0",
+      "evidence": "na_rep=None, join: 'AlignJoin' = 'left'"
+     }
+    ],
+    "example": {
+     "explains": "Uses explicit regex, na and join keywords and named wrap parameters, which is the 3.1.0-safe way to call the `.str` accessor.",
+     "code": "import pandas as pd\n\n# replace: pass regex=True for a regex; the default is a literal match\ns = pd.Series([\"apple pie\", \"Banana-split\", \"cherry tart\"])\nr = s.str.replace(r\"[-\\s]+\", \"_\", regex=True)\nassert r.tolist() == [\"apple_pie\", \"Banana_split\", \"cherry_tart\"]\nlit = pd.Series([\"a.b\", \"axb\"]).str.replace(\".\", \"-\")\nassert lit.tolist() == [\"a-b\", \"axb\"]\n\n# contains / startswith: give na explicitly for a clean boolean mask\nm = pd.Series([\"apple\", \"Banana\", None, \"cherry\"])\nmask = m.str.contains(\"an\", case=False, na=False)\nassert mask.tolist() == [False, True, False, False]\nstarts = m.str.startswith((\"apple\", \"cherry\"), na=False)\nassert starts.tolist() == [True, False, False, True]\n\n# match is anchored at the start only; fullmatch checks the whole string\nd = pd.Series([\"2024-01-05\", \"2024-01-05x\"])\nassert d.str.match(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, True]\nassert d.str.fullmatch(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, False]\n\n# split: say whether the pattern is a regex\nparts = pd.Series([\"a1b22c\"]).str.split(r\"\\d+\", regex=True, expand=True)\nassert parts.iloc[0].tolist() == [\"a\", \"b\", \"c\"]\n\n# wrap: only the named textwrap parameters are accepted (no extra kwargs)\nw = pd.Series([\"the quick brown fox\"]).str.wrap(width=10, break_long_words=False)\nassert w.iloc[0] == \"the quick\\nbrown fox\"\n\n# cat aligns on the index; set join and na_rep explicitly\nleft = pd.Series([\"a\", \"b\"], index=[0, 1])\nright = pd.Series([\"x\", \"y\"], index=[1, 2])\nc = left.str.cat(right, sep=\"-\", na_rep=\"?\", join=\"left\")\nassert c.tolist() == [\"a-?\", \"b-x\"]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the only recorded change to the `.str` accessor is the removal of the kwargs catch-all from `Series.str.wrap`; no `Series.str` method was removed. Textwrap options must now be passed as the named keywords in the `Series.str.wrap` signature, and the other `Series.str` methods keep the signatures listed in the catalogue.",
+    "traps": [
+     {
+      "trap": "Passing arbitrary extra keyword arguments through `Series.str.wrap` to textwrap, relying on its old kwargs catch-all.",
+      "instead": "Pass only the named parameters in the `Series.str.wrap` signature, such as width, break_long_words, max_lines and placeholder. The kwargs parameter is removed in 3.1.0.",
+      "since": "3.1.0",
+      "evidence": "expand_tabs: 'bool' = True, tabsize: 'int' = 8, replace_whitespace: 'bool' = True"
+     },
+     {
+      "trap": "Passing a regular expression to `Series.str.replace` without setting regex, expecting it to be treated as a regex.",
+      "instead": "Pass regex=True when pat is a regular expression and regex=False when it is a literal string. The signature default is regex=False.",
+      "since": "3.1.0",
+      "evidence": "case: 'bool | None' = None, flags: 'int' = 0, regex: 'bool' = False"
+     },
+     {
+      "trap": "Leaving na unset in `Series.str.contains` on data with missing values and then filtering with the result.",
+      "instead": "Pass na=False (or na=True) so your code sets the result for missing entries. The default is the <no_default> sentinel, and the catalogue does not say what it resolves to.",
+      "since": "3.1.0",
+      "evidence": "flags: 'int' = 0, na=<no_default>, regex: 'bool' = True"
+     },
+     {
+      "trap": "Combining several `Series.str.startswith` or `Series.str.endswith` calls with | to test more than one prefix or suffix.",
+      "instead": "Pass a tuple of strings as pat in a single call, which the signature accepts. Pass na explicitly as well.",
+      "since": "3.1.0",
+      "evidence": "pat: 'str | tuple[str, ...]'"
+     },
+     {
+      "trap": "Using `Series.str.match` to check that a whole string fits a pattern.",
+      "instead": "Use `Series.str.fullmatch` for whole-string checks. `Series.str.match` only requires a match at the start, so trailing characters still pass.",
+      "since": "3.1.0",
+      "evidence": "Determine if each string starts with a match of a regular expression."
+     },
+     {
+      "trap": "Calling `Series.str.cat` with another Series that has a different index and expecting a purely positional concatenation.",
+      "instead": "Remember that others are aligned using join, which defaults to 'left'. Pass join explicitly, and pass na_rep to set the text used for missing parts.",
+      "since": "3.1.0",
+      "evidence": "na_rep=None, join: 'AlignJoin' = 'left'"
+     }
+    ],
+    "example": {
+     "explains": "Calls the `.str` accessor with explicit regex, na and join keywords and only named `Series.str.wrap` parameters, and asserts each result.",
+     "code": "import pandas as pd\n\n# replace: state regex explicitly for both regex and literal patterns\ns = pd.Series([\"apple pie\", \"Banana-split\", \"cherry tart\"])\nr = s.str.replace(r\"[-\\s]+\", \"_\", regex=True)\nassert r.tolist() == [\"apple_pie\", \"Banana_split\", \"cherry_tart\"]\nlit = pd.Series([\"a.b\", \"axb\"]).str.replace(\".\", \"-\", regex=False)\nassert lit.tolist() == [\"a-b\", \"axb\"]\n\n# contains / startswith: set na yourself; startswith takes a tuple of prefixes\nm = pd.Series([\"apple\", \"Banana\", None, \"cherry\"])\nmask = m.str.contains(\"an\", case=False, na=False)\nassert mask.tolist() == [False, True, False, False]\nstarts = m.str.startswith((\"apple\", \"cherry\"), na=False)\nassert starts.tolist() == [True, False, False, True]\n\n# match needs a match at the start only; fullmatch checks the whole string\nd = pd.Series([\"2024-01-05\", \"2024-01-05x\"])\nassert d.str.match(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, True]\nassert d.str.fullmatch(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, False]\n\n# split: state whether the pattern is a regex\nparts = pd.Series([\"a1b22c\"]).str.split(r\"\\d+\", regex=True, expand=True)\nassert parts.iloc[0].tolist() == [\"a\", \"b\", \"c\"]\n\n# wrap: only the named textwrap parameters are accepted\nw = pd.Series([\"the quick brown fox\"]).str.wrap(width=10, break_long_words=False)\nassert w.iloc[0] == \"the quick\\nbrown fox\"\n\n# cat aligns others using join; set join and na_rep explicitly\nleft = pd.Series([\"a\", \"b\"], index=[0, 1])\nright = pd.Series([\"x\", \"y\"], index=[1, 2])\nc = left.str.cat(right, sep=\"-\", na_rep=\"?\", join=\"left\")\nassert c.tolist() == [\"a-?\", \"b-x\"]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  },
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0 the catalogue records one change for the `.str` accessor: the kwargs parameter of `Series.str.wrap` is gone, and no `Series.str` method was removed. Textwrap options must now be passed as the named keywords in the 3.1.0 `Series.str.wrap` signature; for the other `Series.str` methods the catalogue lists only the current signatures.",
+    "traps": [
+     {
+      "trap": "Passing arbitrary extra keyword arguments through `Series.str.wrap` to textwrap, relying on its old kwargs catch-all.",
+      "instead": "Pass only the named parameters in the `Series.str.wrap` signature, such as width, break_long_words, max_lines and placeholder. The kwargs parameter was removed after 2.3.3 and is absent by 3.1.0; the signature ends at placeholder.",
+      "since": "3.1.0",
+      "evidence": "max_lines: 'int | None' = None, placeholder: 'str' = ' [...]')"
+     },
+     {
+      "trap": "Passing a regular expression to `Series.str.replace` without setting regex, expecting it to be treated as a regex.",
+      "instead": "Pass regex=True when pat is a regular expression and regex=False when it is a literal string. The signature default is regex=False.",
+      "since": "3.1.0",
+      "evidence": "case: 'bool | None' = None, flags: 'int' = 0, regex: 'bool' = False"
+     },
+     {
+      "trap": "Leaving na unset in `Series.str.contains` on data with missing values and then filtering with the result.",
+      "instead": "Pass na=False (or na=True) so your code sets the result for missing entries. The default is the <no_default> sentinel, and the catalogue does not say what it resolves to.",
+      "since": "3.1.0",
+      "evidence": "flags: 'int' = 0, na=<no_default>, regex: 'bool' = True"
+     },
+     {
+      "trap": "Combining several `Series.str.startswith` or `Series.str.endswith` calls with | to test more than one prefix or suffix.",
+      "instead": "Pass a tuple of strings as pat in a single call, which the signature accepts. Pass na explicitly as well.",
+      "since": "3.1.0",
+      "evidence": "pat: 'str | tuple[str, ...]'"
+     },
+     {
+      "trap": "Using `Series.str.match` to check that a whole string fits a pattern.",
+      "instead": "Use `Series.str.fullmatch` for whole-string checks. `Series.str.match` only requires a match at the start, so trailing characters still pass.",
+      "since": "3.1.0",
+      "evidence": "Determine if each string starts with a match of a regular expression."
+     },
+     {
+      "trap": "Calling `Series.str.cat` with another Series that has a different index and expecting a purely positional concatenation.",
+      "instead": "Remember that others are aligned using join, which defaults to 'left'. Pass join explicitly, and pass na_rep to set the text used for missing parts.",
+      "since": "3.1.0",
+      "evidence": "na_rep=None, join: 'AlignJoin' = 'left'"
+     }
+    ],
+    "example": {
+     "explains": "Calls the `.str` accessor with explicit regex, na and join keywords and only named `Series.str.wrap` parameters, and asserts each result.",
+     "code": "import pandas as pd\n\n# replace: state regex explicitly for both regex and literal patterns\ns = pd.Series([\"apple pie\", \"Banana-split\", \"cherry tart\"])\nr = s.str.replace(r\"[-\\s]+\", \"_\", regex=True)\nassert r.tolist() == [\"apple_pie\", \"Banana_split\", \"cherry_tart\"]\nlit = pd.Series([\"a.b\", \"axb\"]).str.replace(\".\", \"-\", regex=False)\nassert lit.tolist() == [\"a-b\", \"axb\"]\n\n# contains / startswith: set na yourself; startswith takes a tuple of prefixes\nm = pd.Series([\"apple\", \"Banana\", None, \"cherry\"])\nmask = m.str.contains(\"an\", case=False, na=False)\nassert mask.tolist() == [False, True, False, False]\nstarts = m.str.startswith((\"apple\", \"cherry\"), na=False)\nassert starts.tolist() == [True, False, False, True]\n\n# match needs a match at the start only; fullmatch checks the whole string\nd = pd.Series([\"2024-01-05\", \"2024-01-05x\"])\nassert d.str.match(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, True]\nassert d.str.fullmatch(r\"\\d{4}-\\d{2}-\\d{2}\").tolist() == [True, False]\n\n# split: state whether the pattern is a regex\nparts = pd.Series([\"a1b22c\"]).str.split(r\"\\d+\", regex=True, expand=True)\nassert parts.iloc[0].tolist() == [\"a\", \"b\", \"c\"]\n\n# wrap: only the named textwrap parameters are accepted\nw = pd.Series([\"the quick brown fox\"]).str.wrap(width=10, break_long_words=False)\nassert w.iloc[0] == \"the quick\\nbrown fox\"\n\n# cat aligns others using join; set join and na_rep explicitly\nleft = pd.Series([\"a\", \"b\"], index=[0, 1])\nright = pd.Series([\"x\", \"y\"], index=[1, 2])\nc = left.str.cat(right, sep=\"-\", na_rep=\"?\", join=\"left\")\nassert c.tolist() == [\"a-?\", \"b-x\"]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

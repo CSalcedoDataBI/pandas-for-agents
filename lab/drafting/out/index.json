@@ -1,0 +1,193 @@
+{
+ "batch": "index",
+ "title": "Index",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes the `Index` dtype-check methods deprecated in 2.0.0 (`Index.is_integer`, `Index.is_floating`, `Index.is_numeric`, `Index.is_boolean`, `Index.is_object`, `Index.is_categorical`, `Index.is_interval`, `Index.holds_integer`), along with `Index.sort` and `Index.format`. The `downcast` keyword of `Index.fillna`, deprecated in 2.1.0, is also gone, so `Index.fillna` now accepts only a value.",
+    "traps": [
+     {
+      "trap": "Calling `Index.is_integer` to test for an integer index.",
+      "instead": "Pass the dtype to `pandas.api.types.is_integer_dtype`.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_integer_dtype` instead."
+     },
+     {
+      "trap": "Calling `Index.is_floating` (or `Index.is_numeric`) to test for float or numeric data.",
+      "instead": "Use `pandas.api.types.is_float_dtype`, or `pandas.api.types.is_numeric_dtype` for any numeric dtype.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_float_dtype` instead"
+     },
+     {
+      "trap": "Calling `Index.is_categorical`, or replacing it with `pandas.api.types.is_categorical_dtype`, which is deprecated since 2.2.0 and warns.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.CategoricalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.CategoricalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.is_interval`, or `pandas.api.types.is_interval_dtype`, which is deprecated since 2.2.0.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.IntervalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.IntervalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.holds_integer` to see whether the labels are integers.",
+      "instead": "Use `pandas.api.types.infer_dtype` on the index and compare the result to \"integer\".",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.infer_dtype` instead"
+     },
+     {
+      "trap": "Calling `Index.sort` to sort an index.",
+      "instead": "Use `Index.sort_values`, which returns a sorted copy.",
+      "since": "3.1.0",
+      "evidence": "Use sort_values instead."
+     },
+     {
+      "trap": "Calling `Index.format` to render labels as strings with formatter or na_rep.",
+      "instead": "Use `Index.map` with a formatting callable, for example str, and handle missing values with `Index.fillna` first.",
+      "since": "3.1.0",
+      "evidence": "(name: 'bool' = False, formatter: 'Callable | None' = None, na_rep: 'str_t' = 'NaN')"
+     },
+     {
+      "trap": "Passing the downcast keyword to `Index.fillna`.",
+      "instead": "Call `Index.fillna` with only the value, then cast explicitly with `Index.astype` if you need another dtype.",
+      "since": "2.1.0",
+      "evidence": "\"target\": \"parameter:downcast\""
+     }
+    ],
+    "example": {
+     "explains": "The script replaces the removed `Index` type checks with `pandas.api.types` functions and dtype isinstance checks, sorts with `Index.sort_values`, fills without downcast, and formats with `Index.map`. Every warning is turned into an error.",
+     "code": "import warnings\nwarnings.simplefilter(\"error\")\n\nimport numpy as np\nimport pandas as pd\nfrom pandas.api.types import CategoricalDtype, infer_dtype, is_float_dtype, is_integer_dtype, is_numeric_dtype\n\nints = pd.Index([3, 1, 2])\nfloats = pd.Index([1.5, np.nan, 0.5])\n\n# Index.is_integer was removed: check the dtype instead\nassert is_integer_dtype(ints.dtype)\n# Index.is_floating and Index.is_numeric were removed\nassert is_float_dtype(floats.dtype)\nassert is_numeric_dtype(floats.dtype)\n# Index.holds_integer was removed\nassert infer_dtype(ints) == \"integer\"\n\n# Index.is_categorical was removed: use an isinstance check on the dtype\ncats = pd.Index([\"a\", \"b\", \"a\"]).astype(\"category\")\nassert isinstance(cats.dtype, CategoricalDtype)\nassert not isinstance(ints.dtype, CategoricalDtype)\n\n# Index.sort was removed: sort_values returns a sorted copy\nassert ints.sort_values().tolist() == [1, 2, 3]\n\n# the downcast keyword of fillna is gone: fill, then cast explicitly\nfilled = floats.fillna(0.0)\nassert not filled.hasnans\nassert filled.tolist() == [1.5, 0.0, 0.5]\nas_int = pd.Index([1.0, np.nan]).fillna(0.0).astype(\"int64\")\nassert as_int.tolist() == [1, 0]\n\n# Index.format was removed: map a formatter over the labels\nlabels = ints.map(str)\nassert labels.tolist() == [\"3\", \"1\", \"2\"]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [
+    "index.md: `pandas.api.types`: api is not in pandas of pandas 3.1.0",
+    "index.md block 1: .simplefilter is not in pandas 3.1.0"
+   ]
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes the `Index` dtype-check methods deprecated in 2.0.0 (`Index.is_integer`, `Index.is_floating`, `Index.is_numeric`, `Index.is_boolean`, `Index.is_object`, `Index.is_categorical`, `Index.is_interval`, `Index.holds_integer`), along with `Index.sort` and `Index.format`. The downcast keyword of `Index.fillna`, deprecated in 2.1.0, is also gone, so `Index.fillna` now accepts only a value.",
+    "traps": [
+     {
+      "trap": "Calling `Index.is_integer` to test for an integer index.",
+      "instead": "Pass the dtype to `pandas.api.types.is_integer_dtype`.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_integer_dtype` instead."
+     },
+     {
+      "trap": "Calling `Index.is_floating` (or `Index.is_numeric`) to test for float or numeric data.",
+      "instead": "Use `pandas.api.types.is_float_dtype`, or `pandas.api.types.is_numeric_dtype` for any numeric dtype.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_float_dtype` instead"
+     },
+     {
+      "trap": "Calling `Index.is_categorical`, or replacing it with `pandas.api.types.is_categorical_dtype`, which is deprecated since 2.2.0 and warns.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.CategoricalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.CategoricalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.is_interval`, or `pandas.api.types.is_interval_dtype`, which is deprecated since 2.2.0.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.IntervalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.IntervalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.holds_integer` to see whether the labels are integers.",
+      "instead": "Use `pandas.api.types.infer_dtype` on the index and compare the result to \"integer\".",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.infer_dtype` instead"
+     },
+     {
+      "trap": "Calling `Index.sort` to sort an index.",
+      "instead": "Use `Index.sort_values`, which returns a sorted copy.",
+      "since": "3.1.0",
+      "evidence": "Use sort_values instead."
+     },
+     {
+      "trap": "Calling `Index.format` to render labels as strings with formatter or na_rep.",
+      "instead": "Use `Index.map` with a formatting callable, for example str, and handle missing values with `Index.fillna` first.",
+      "since": "3.1.0",
+      "evidence": "(name: 'bool' = False, formatter: 'Callable | None' = None, na_rep: 'str_t' = 'NaN')"
+     },
+     {
+      "trap": "Passing the downcast keyword to `Index.fillna`.",
+      "instead": "Call `Index.fillna` with only the value, then cast explicitly with `Index.astype` if you need another dtype.",
+      "since": "2.1.0",
+      "evidence": "\"target\": \"parameter:downcast\""
+     }
+    ],
+    "example": {
+     "explains": "The script replaces the removed `Index` type checks with `pandas.api.types.is_integer_dtype`, `pandas.api.types.is_float_dtype`, `pandas.api.types.infer_dtype` and a dtype isinstance check, sorts with `Index.sort_values`, fills without downcast, and formats with `Index.map`. It runs cleanly with warnings treated as errors.",
+     "code": "import numpy as np\nimport pandas as pd\nfrom pandas.api.types import CategoricalDtype, infer_dtype, is_float_dtype, is_integer_dtype, is_numeric_dtype\n\nints = pd.Index([3, 1, 2])\nfloats = pd.Index([1.5, np.nan, 0.5])\n\n# Index.is_integer was removed: check the dtype instead\nassert is_integer_dtype(ints.dtype)\n# Index.is_floating and Index.is_numeric were removed\nassert is_float_dtype(floats.dtype)\nassert is_numeric_dtype(floats.dtype)\n# Index.holds_integer was removed\nassert infer_dtype(ints) == \"integer\"\n\n# Index.is_categorical was removed: use an isinstance check on the dtype\ncats = pd.Index([\"a\", \"b\", \"a\"]).astype(\"category\")\nassert isinstance(cats.dtype, CategoricalDtype)\nassert not isinstance(ints.dtype, CategoricalDtype)\n\n# Index.sort was removed: sort_values returns a sorted copy\nassert ints.sort_values().tolist() == [1, 2, 3]\n\n# the downcast keyword of fillna is gone: fill, then cast explicitly\nfilled = floats.fillna(0.0)\nassert not filled.hasnans\nassert filled.tolist() == [1.5, 0.0, 0.5]\nas_int = pd.Index([1.0, np.nan]).fillna(0.0).astype(\"int64\")\nassert as_int.tolist() == [1, 0]\n\n# Index.format was removed: map a formatter over the labels\nlabels = ints.map(str)\nassert labels.tolist() == [\"3\", \"1\", \"2\"]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes the `Index` dtype-check methods deprecated in 2.0.0 (`Index.is_integer`, `Index.is_floating`, `Index.is_numeric`, `Index.is_boolean`, `Index.is_object`, `Index.is_categorical`, `Index.is_interval`, `Index.holds_integer`); the excerpt also lists `Index.sort` and `Index.format` as removed. The downcast keyword of `Index.fillna`, deprecated in 2.1.0, is gone, so `Index.fillna` now takes only a value.",
+    "traps": [
+     {
+      "trap": "Calling `Index.is_integer` to test for an integer index.",
+      "instead": "Pass the dtype to `pandas.api.types.is_integer_dtype`.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_integer_dtype` instead."
+     },
+     {
+      "trap": "Calling `Index.is_floating` (or `Index.is_numeric`) to test for float or numeric data.",
+      "instead": "Use `pandas.api.types.is_float_dtype`, or `pandas.api.types.is_numeric_dtype` for any numeric dtype.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_float_dtype` instead"
+     },
+     {
+      "trap": "Calling `Index.is_boolean` to test for a boolean index.",
+      "instead": "Pass the dtype to `pandas.api.types.is_bool_dtype`.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_bool_dtype` instead."
+     },
+     {
+      "trap": "Calling `Index.is_object` to test for object dtype.",
+      "instead": "Pass the dtype to `pandas.api.types.is_object_dtype`.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.is_object_dtype` instead."
+     },
+     {
+      "trap": "Calling `Index.is_categorical`, or replacing it with `pandas.api.types.is_categorical_dtype`, which is deprecated since 2.2.0 and warns.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.CategoricalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.CategoricalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.is_interval`, or `pandas.api.types.is_interval_dtype`, which is deprecated since 2.2.0.",
+      "instead": "Check `isinstance(idx.dtype, pandas.api.types.IntervalDtype)`.",
+      "since": "2.0.0",
+      "evidence": "Use `isinstance(index.dtype, pd.IntervalDtype)` instead."
+     },
+     {
+      "trap": "Calling `Index.holds_integer` to see whether the labels are integers.",
+      "instead": "Call `pandas.api.types.infer_dtype` on the index and inspect the string label it returns.",
+      "since": "2.0.0",
+      "evidence": "Use `pandas.api.types.infer_dtype` instead"
+     },
+     {
+      "trap": "Passing the downcast keyword to `Index.fillna`.",
+      "instead": "Call `Index.fillna` with only the value, then cast explicitly with `Index.astype` if you need another dtype.",
+      "since": "2.1.0",
+      "evidence": "\"target\": \"parameter:downcast\""
+     }
+    ],
+    "example": {
+     "explains": "The script replaces the removed `Index` type checks with `pandas.api.types.is_integer_dtype`, `pandas.api.types.is_float_dtype`, `pandas.api.types.is_numeric_dtype`, `pandas.api.types.is_bool_dtype`, `pandas.api.types.is_object_dtype`, `pandas.api.types.infer_dtype` and a dtype isinstance check, then fills missing values without downcast and casts with `Index.astype`. It runs cleanly with warnings treated as errors.",
+     "code": "import numpy as np\nimport pandas as pd\nfrom pandas.api.types import CategoricalDtype, infer_dtype, is_bool_dtype, is_float_dtype, is_integer_dtype, is_numeric_dtype, is_object_dtype\n\nints = pd.Index([3, 1, 2])\nfloats = pd.Index([1.5, np.nan, 0.5])\nbools = pd.Index([True, False, True])\nobjs = pd.Index([1, \"a\"], dtype=object)\n\n# old Index.is_integer: check the dtype instead\nassert is_integer_dtype(ints.dtype)\n# old Index.is_floating and Index.is_numeric\nassert is_float_dtype(floats.dtype)\nassert is_numeric_dtype(floats.dtype)\n# old Index.is_boolean and Index.is_object\nassert is_bool_dtype(bools.dtype)\nassert is_object_dtype(objs.dtype)\nassert not is_object_dtype(ints.dtype)\n# old Index.holds_integer: infer_dtype returns a string label\nlabel = infer_dtype(ints)\nassert isinstance(label, str)\nassert label == \"integer\"\n\n# old Index.is_categorical: isinstance check on the dtype\ncats = pd.Index([\"a\", \"b\", \"a\"]).astype(\"category\")\nassert isinstance(cats.dtype, CategoricalDtype)\nassert not isinstance(ints.dtype, CategoricalDtype)\n\n# sorting uses sort_values, which returns a sorted copy\nassert ints.sort_values().tolist() == [1, 2, 3]\n\n# fillna takes only a value: fill, then cast explicitly\nfilled = floats.fillna(0.0)\nassert not filled.hasnans\nassert filled.tolist() == [1.5, 0.0, 0.5]\nas_int = pd.Index([1.0, np.nan]).fillna(0.0).astype(\"int64\")\nassert is_integer_dtype(as_int.dtype)\nassert as_int.tolist() == [1, 0]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}

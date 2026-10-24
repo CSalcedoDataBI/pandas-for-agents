@@ -150,12 +150,12 @@ def export_class(cls: type) -> dict:
     return {"class": f"{cls.__module__}.{cls.__qualname__}", "members": members}
 
 
-def export_top_level() -> dict:
+def export_module(module, label: str) -> dict:
     members = {}
-    for name in sorted(dir(pd)):
+    for name in sorted(dir(module)):
         if name.startswith("_"):
             continue
-        obj = getattr(pd, name)
+        obj = getattr(module, name)
         if inspect.ismodule(obj):
             continue
         if inspect.isclass(obj):
@@ -173,7 +173,7 @@ def export_top_level() -> dict:
             except (TypeError, ValueError):
                 pass
         members[name] = entry
-    return {"class": "pandas", "members": members}
+    return {"class": label, "members": members}
 
 
 def build() -> dict:
@@ -189,7 +189,9 @@ def build() -> dict:
             "Copyright (c) 2008-2011, AQR Capital Management, LLC, Lambda Foundry, Inc. and PyData "
             "Development Team; 2011-2025, Open source contributors.",
         },
-        "groups": {"pandas": export_top_level()},
+        # pandas.api.types is where the removed Index.is_* checks point to.
+        "groups": {"pandas": export_module(pd, "pandas"),
+                   "pandas.api.types": export_module(pd.api.types, "pandas.api.types")},
     }
     for group, cls in groups().items():
         catalog["groups"][group] = export_class(cls)

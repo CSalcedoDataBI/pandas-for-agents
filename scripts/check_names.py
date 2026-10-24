@@ -34,11 +34,12 @@ FOREIGN = {"np", "numpy", "math", "datetime", "re", "json", "os", "sys", "time",
 ACCESSORS = {"str": ["Series.str"], "dt": ["Series.dt (datetime)", "Series.dt (timedelta)", "Series.dt (period)"],
              "cat": ["Series.cat"], "sparse": ["Series.sparse", "DataFrame.sparse"],
              "plot": ["Series.plot", "DataFrame.plot"]}
-OWNERS = {"pd": ["pandas"], "pandas": ["pandas"], "DataFrame": ["DataFrame"], "Series": ["Series"],
+OWNERS = {"pd": ["pandas"], "pandas": ["pandas"], "pd.api.types": ["pandas.api.types"],
+          "pandas.api.types": ["pandas.api.types"], "DataFrame": ["DataFrame"], "Series": ["Series"],
           "Index": ["Index"], "GroupBy": ["DataFrameGroupBy", "SeriesGroupBy"],
           "DataFrameGroupBy": ["DataFrameGroupBy"], "SeriesGroupBy": ["SeriesGroupBy"],
           "Resampler": ["Resampler"]}
-INLINE = re.compile(r"(?<![\w.])(pd|pandas|DataFrame|Series|Index|GroupBy|DataFrameGroupBy|SeriesGroupBy|Resampler)"
+INLINE = re.compile(r"(?<![\w.])(pd\.api\.types|pandas\.api\.types|pd|pandas|DataFrame|Series|Index|GroupBy|DataFrameGroupBy|SeriesGroupBy|Resampler)"
                     r"\.(\w+)(?:\.(\w+))?")
 FENCE = re.compile(r"^```python[^\n]*\n(.*?)^```", re.S | re.M)
 INLINE_CODE = re.compile(r"`([^`\n]+)`")
@@ -60,7 +61,7 @@ class Catalogue:
         for changes in CATALOG.glob(f"changes-*-to-{self.version}.json"):
             for g, d in json.loads(changes.read_text(encoding="utf-8"))["groups"].items():
                 self.removed.setdefault(g, set()).update(d["removed"])
-        self.all_members = {n for g, m in self.groups.items() if g != "pandas" for n in m}
+        self.all_members = {n for g, m in self.groups.items() if not g.startswith("pandas") for n in m}
 
     def entries(self, groups: list[str], name: str) -> list[dict]:
         return [self.groups[g][name] for g in groups if name in self.groups.get(g, {})]
@@ -75,6 +76,8 @@ def check_inline(cat: Catalogue, text: str) -> list[str]:
     for code in INLINE_CODE.findall(prose):
         for owner, name, sub in INLINE.findall(code):
             groups = OWNERS[owner]
+            if owner in ("pd", "pandas") and name == "api":
+                continue  # the module path itself; its members are matched as pandas.api.types.<name>
             if sub and name in ACCESSORS:
                 groups, name = ACCESSORS[name], sub
             if not cat.entries(groups, name) and not cat.is_removed(groups, name):
@@ -105,13 +108,21 @@ def check_code(cat: Catalogue, code: str, where: str) -> list[str]:
         if isinstance(base, ast.Name) and base.id in FOREIGN:
             continue
         if isinstance(base, ast.Name) and base.id in ("pd", "pandas"):
+            if name == "api":
+                continue
             groups = ["pandas"]
             ok = bool(cat.entries(groups, name))
+        elif isinstance(base, ast.Attribute) and base.attr == "types" and isinstance(base.value, ast.Attribute) \
+                and base.value.attr == "api":
+            groups = ["pandas.api.types"]
+            ok = bool(cat.entries(groups, name))
+        elif isinstance(base, ast.Attribute) and base.attr in ("api", "types") and name in ("types", "api"):
+            continue
         elif isinstance(base, ast.Attribute) and base.attr in ACCESSORS:
             groups = ACCESSORS[base.attr]
             ok = bool(cat.entries(groups, name))
         else:
-            groups = [g for g in cat.groups if g != "pandas"]
+            groups = [g for g in cat.groups if not g.startswith("pandas")]
             ok = name in cat.all_members
         if not ok:
             gone = " (removed: see catalog/changes-*.json)" if cat.is_removed(groups, name) else ""

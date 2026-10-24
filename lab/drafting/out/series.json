@@ -1,0 +1,76 @@
+{
+ "batch": "series",
+ "title": "Series-only members",
+ "from": "2.3.3",
+ "to": "3.1.0",
+ "passed": true,
+ "attempts": [
+  {
+   "card": {
+    "summary": "Between 2.3.3 and 3.1.0, pandas removed `Series.ravel` and `Series.view` from Series; both were deprecated in 2.2.0. All other Series-only members listed in the catalogue are still present in 3.1.0.",
+    "traps": [
+     {
+      "trap": "Calling `Series.ravel` to flatten a Series into a 1D array.",
+      "instead": "Drop the call, because a Series is already 1D. Use `Series.to_list` for a Python list or `Series.array` for the backing array.",
+      "since": "2.2.0",
+      "evidence": "Series.ravel is deprecated. The underlying array is already 1D, so ravel is not necessary."
+     },
+     {
+      "trap": "Calling `Series.view` to reinterpret or change the dtype of a Series.",
+      "instead": "Use `Series.astype` to change the dtype.",
+      "since": "2.2.0",
+      "evidence": "``Series.view`` is deprecated and will be removed in a future version. Use :meth:`Series.astype` as an alternative to change the dtype."
+     },
+     {
+      "trap": "Passing a boolean (True/False) as `inclusive` to `Series.between`.",
+      "instead": "Pass one of the strings 'both', 'neither', 'left' or 'right'. The default is 'both'.",
+      "since": "3.1.0",
+      "evidence": "Literal['both', 'neither', 'left', 'right']"
+     },
+     {
+      "trap": "Treating the result of `Series.argmax` or `Series.argmin` as an index label.",
+      "instead": "Treat the result as an integer position, not a label.",
+      "since": "3.1.0",
+      "evidence": "Return int position of the largest value in the Series."
+     }
+    ],
+    "example": {
+     "explains": "The script flattens a Series without the removed method, filters with string values for `inclusive` in `Series.between`, and checks that `Series.argmax` and `Series.argmin` return integer positions.",
+     "code": "import pandas as pd\n\ns = pd.Series([3, 9, 1, 7], index=[\"a\", \"b\", \"c\", \"d\"], name=\"v\")\n\n# A Series is already 1D: no flattening call is needed.\nvals = s.to_list()\nassert vals == [3, 9, 1, 7]\nassert len(s.array) == 4\n\n# inclusive takes a string, not a bool.\nboth = s.between(3, 7, inclusive=\"both\")\nassert both.to_list() == [True, False, False, True]\nleft = s.between(3, 7, inclusive=\"left\")\nassert left.to_list() == [True, False, False, False]\n\n# argmax/argmin return integer positions, not labels.\nassert s.argmax() == 1\nassert s.argmin() == 2\nprint(\"ok\")\n"
+    }
+   },
+   "failures": []
+  },
+  {
+   "card": {
+    "summary": "pandas 3.1.0 removes `Series.ravel` and `Series.view` from Series; both were deprecated in 2.2.0. The other Series-only members in the catalogue keep their 2.3.3 form, and no keyword arguments were removed from this group.",
+    "traps": [
+     {
+      "trap": "Calling `Series.ravel` to get the Series data as a numpy array.",
+      "instead": "Use `Series.to_numpy`. A Series is already 1D, so no flattening step is needed.",
+      "since": "2.2.0",
+      "evidence": "Use :meth:`to_numpy` for conversion to a numpy array instead."
+     },
+     {
+      "trap": "Calling `Series.ravel` to get the underlying ExtensionArray of an extension-dtype Series.",
+      "instead": "Use `Series.array` to get the backing array directly, or `Series.to_numpy` when a numpy array is needed.",
+      "since": "2.2.0",
+      "evidence": "Return the flattened underlying data as an ndarray or ExtensionArray."
+     },
+     {
+      "trap": "Calling `Series.view` with a dtype to reinterpret or change the dtype of a Series.",
+      "instead": "Use `Series.astype` to change the dtype.",
+      "since": "2.2.0",
+      "evidence": "``Series.view`` is deprecated and will be removed in a future version. Use :meth:`Series.astype` as an alternative to change the dtype."
+     }
+    ],
+    "example": {
+     "explains": "The script gets a numpy array with `Series.to_numpy` instead of the removed flattening method, reads the backing array with `Series.array`, and changes the dtype with `Series.astype` instead of the removed view method.",
+     "code": "import numpy as np\nimport pandas as pd\n\ns = pd.Series([3, 9, 1, 7], index=[\"a\", \"b\", \"c\", \"d\"], name=\"v\")\n\n# A Series is already 1D: convert with to_numpy, no flattening call needed.\narr = s.to_numpy()\nassert isinstance(arr, np.ndarray)\nassert arr.ndim == 1\nassert arr.tolist() == [3, 9, 1, 7]\n\n# The backing array of an extension dtype Series.\nm = pd.Series([1, None, 3], dtype=\"Int64\")\nback = m.array\nassert len(back) == 3\nassert str(back.dtype) == \"Int64\"\n\n# Change the dtype with astype.\nf = s.astype(\"float64\")\nassert f.dtype == np.dtype(\"float64\")\nassert f.to_list() == [3.0, 9.0, 1.0, 7.0]\nprint(\"ok\")\n"
+    }
+   },
+   "failures": [],
+   "from_review": true
+  }
+ ]
+}
