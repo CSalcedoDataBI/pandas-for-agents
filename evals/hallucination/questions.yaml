@@ -1,0 +1,129 @@
+# Questions for the invented-name A/B. Same design as powerquery-m-for-agents and dax-for-agents.
+#
+# Each question must be one whose answer NAMES PANDAS FUNCTIONS OR METHODS, because that is what
+# the metric counts: every `pd.<x>`, `DataFrame.<x>`, `Series.<x>`, `Series.str.<x>`, `GroupBy.<x>`
+# (etc.) an answer writes in code. A question answerable in prose measures nothing.
+#
+# `regime` splits the bank in two, and the halves are never averaged together:
+#   core  the everyday surface every tutorial covers: pd.* constructors/IO, DataFrame/Series
+#         selection and reshaping, groupby basics.
+#   deep  the trap-prone surface -- APIs REMOVED in pandas 3.x that a model trained on pandas 2.x
+#         still writes (applymap, first/last, swapaxes, GroupBy.fillna, read_gbq), and the less
+#         common corners. This is exactly where a current reference earns its keep.
+# The claim "the reference helps" can be true for one half and false for the other, and a single
+# blended number would hide which.
+#
+# `category` is the catalogue group (catalog/pandas-*.json -> groups) whose rows arm B is given:
+# names and one-line summaries, never the card that holds the answer. For a removed name, the
+# reference's rows are the CURRENT members -- the replacement is there, the removed name is not.
+#
+# `traps` are names the question is known to attract that are NOT in current pandas (removed or
+# never existed). They document what the question is for; a test asserts each is flagged.
+
+questions:
+  # ---------------------------------------------------------------- core
+  - id: read-csv-usecols
+    regime: core
+    category: pandas
+    question: >-
+      In pandas, how do I read a CSV file and keep only two columns by name while reading? Name
+      the function and the argument and show a short snippet.
+    traps: [pd.load_csv, pd.read_table_csv]
+
+  - id: concat-frames
+    regime: core
+    category: pandas
+    question: >-
+      In pandas, I have two DataFrames with the same columns and want to stack them into one.
+      What is the current, recommended way? Name the function and show it.
+    traps: [pd.concat_frames, pd.stack_frames]
+
+  - id: merge-frames
+    regime: core
+    category: pandas
+    question: >-
+      In pandas, how do I left-join two DataFrames on a shared "id" column? Name the function and
+      its key arguments and show it.
+    traps: [pd.join_frames]
+
+  - id: groupby-agg
+    regime: core
+    category: DataFrame
+    question: >-
+      In pandas, how do I group a DataFrame by "region" and sum "sales" per group? Name the
+      methods and show the snippet.
+    traps: [DataFrame.group, DataFrame.summarize]
+
+  - id: pivot-table
+    regime: core
+    category: DataFrame
+    question: >-
+      In pandas, how do I build a pivot table: mean of "value" with "a" as rows and "b" as
+      columns? Name the method and show it.
+    traps: [DataFrame.pivot_wider, DataFrame.crosstab_table]
+
+  - id: value-counts-series
+    regime: core
+    category: Series
+    question: >-
+      In pandas, given a Series, how do I get the count of each distinct value and, separately,
+      the array of unique values? Name the methods and show them.
+    traps: [Series.counts, Series.distinct]
+
+  - id: series-items
+    regime: core
+    category: Series
+    question: >-
+      In pandas, how do I iterate over the (index, value) pairs of a Series in a current pandas
+      version? Name the method and show the loop.
+    traps: [Series.iteritems, Series.iteritem]
+
+  - id: str-contains-extract
+    regime: core
+    category: Series.str
+    question: >-
+      In pandas, on a string Series, how do I keep rows whose text contains "error" (regex), and
+      separately extract a regex capture group? Name the string methods and show them.
+    traps: [Series.str.includes, Series.str.regex_extract]
+
+  # ---------------------------------------------------------------- deep
+  - id: elementwise-map
+    regime: deep
+    category: DataFrame
+    question: >-
+      In a current pandas (3.x), how do I apply a Python function elementwise to every cell of a
+      whole DataFrame? Name the exact method and show it.
+    traps: [DataFrame.applymap]
+
+  - id: transpose-swap
+    regime: deep
+    category: DataFrame
+    question: >-
+      In a current pandas (3.x), how do I swap the rows and columns (transpose) of a DataFrame?
+      Name the current attribute or method and show it.
+    traps: [DataFrame.swapaxes]
+
+  - id: index-is-integer
+    regime: deep
+    category: pandas.api.types
+    question: >-
+      In a current pandas (3.x), how do I check whether a Series or Index holds integer values?
+      The Index.is_integer method was removed -- name the current function in the API-types
+      namespace and show it.
+    traps: [pd.api.types.is_interval]
+
+  - id: str-pad-zeros
+    regime: deep
+    category: Series.str
+    question: >-
+      In pandas, on a string Series, how do I left-pad values with zeros to width 6, and
+      separately uppercase them? Name the string methods and show them.
+    traps: [Series.str.lpad, Series.str.zpad]
+
+  - id: dt-accessor
+    regime: deep
+    category: Series.dt (datetime)
+    question: >-
+      In pandas, from a datetime Series, how do I get the year and the day-of-week as separate
+      Series via the dt accessor? Name the dt attributes and show them.
+    traps: [Series.dt.weekday_name, Series.dt.get_year]
