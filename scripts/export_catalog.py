@@ -70,6 +70,7 @@ def groups() -> dict[str, type]:
     }
 
 
+STAR_ARGS = re.compile(r"``\*{1,2}(args|kwargs)``")
 ADDRESS = re.compile(r"<object object at 0x[0-9A-Fa-f]+>")
 
 
@@ -86,17 +87,24 @@ def summary(doc: str) -> str:
 
 def deprecations(doc: str) -> list[dict]:
     """Each `.. deprecated::` note, attached to the parameter it sits under when it is inside the
-    Parameters section, otherwise to the member itself."""
+    Parameters section, otherwise to the member itself.
+
+    A note that names ``*args`` or ``**kwargs`` is about those, wherever it sits: pandas puts such
+    notes after an unrelated parameter (GroupBy.skew, GroupBy.take). Only an indented note belongs
+    to the parameter documented above it; one at column 0 belongs to the member."""
     sections = [(m.start(), m.group(1).strip()) for m in SECTION.finditer(doc)]
     out = []
     for m in DEPRECATED.finditer(doc):
+        text = " ".join(line.strip() for line in m.group(3).splitlines() if line.strip())
         section = next((name for start, name in reversed(sections) if start < m.start()), None)
         target = "member"
-        if section in ("Parameters", "Other Parameters"):
+        star = STAR_ARGS.search(text)
+        if star:
+            target = "parameter:" + star.group(1)
+        elif m.group(1) and section in ("Parameters", "Other Parameters"):
             headers = [h for h in PARAM_HEADER.finditer(doc) if h.start() < m.start()]
             if headers:
                 target = "parameter:" + headers[-1].group(1).lstrip("*")
-        text = " ".join(line.strip() for line in m.group(3).splitlines() if line.strip())
         out.append({"version": m.group(2), "target": target, "note": text})
     return out
 

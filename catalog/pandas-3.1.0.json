@@ -7935,7 +7935,7 @@
      "deprecated": [
       {
        "version": "3.1.0",
-       "target": "parameter:numeric_only",
+       "target": "parameter:kwargs",
        "note": "Passing ``**kwargs`` to DataFrameGroupBy.skew is deprecated and will be removed in a future version of pandas."
       }
      ]
@@ -7983,7 +7983,7 @@
      "deprecated": [
       {
        "version": "3.1.0",
-       "target": "parameter:indices",
+       "target": "parameter:kwargs",
        "note": "Passing ``**kwargs`` to DataFrameGroupBy.take is deprecated and will be removed in a future version of pandas."
       }
      ]
@@ -8612,7 +8612,7 @@
      "deprecated": [
       {
        "version": "3.1.0",
-       "target": "parameter:numeric_only",
+       "target": "parameter:kwargs",
        "note": "Passing ``**kwargs`` to SeriesGroupBy.skew is deprecated and will be removed in a future version of pandas."
       }
      ]
@@ -8660,7 +8660,7 @@
      "deprecated": [
       {
        "version": "3.1.0",
-       "target": "parameter:indices",
+       "target": "parameter:kwargs",
        "note": "Passing ``**kwargs`` to SeriesGroupBy.take is deprecated and will be removed in a future version of pandas."
       }
      ]
