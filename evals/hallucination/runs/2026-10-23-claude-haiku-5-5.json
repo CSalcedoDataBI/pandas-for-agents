@@ -1,0 +1,188 @@
+{
+  "model": "claude-haiku-5-5",
+  "provider": "anthropic",
+  "records": [
+    {
+      "id": "read-csv-usecols",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, how do I read a CSV file and keep only two columns by name while reading? Name the function and the argument and show a short snippet.",
+      "A": {
+        "text": "Use `pd.read_csv` with the `usecols` argument, passing a list of column names:\n\n```python\nimport pandas as pd\n\ndf = pd.read_csv(\"data.csv\", usecols=[\"name\", \"price\"])\n```\n\nOnly the listed columns are parsed and loaded, so the rest of the file is never put into the DataFrame. Passing a list of names is the key part; `usecols` also accepts a callable if you need a rule-based filter instead.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `pd.read_csv()` with the `usecols` argument. Passing a list of column names keeps only those columns while the file is parsed.\n\n```python\nimport pandas as pd\n\ndf = pd.read_csv(\"data.csv\", usecols=[\"name\", \"age\"])\n```\n\nUnlisted columns are skipped during parsing, so this also saves memory on wide files.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "concat-frames",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, I have two DataFrames with the same columns and want to stack them into one. What is the current, recommended way? Name the function and show it.",
+      "A": {
+        "text": "Use `pd.concat`, passing the DataFrames as a list. Reset the index so the result has a clean 0..n-1 index:\n\n```python\nimport pandas as pd\n\ndf1 = pd.DataFrame({\"a\": [1, 2], \"b\": [\"x\", \"y\"]})\ndf2 = pd.DataFrame({\"a\": [3, 4], \"b\": [\"z\", \"w\"]})\n\ncombined = pd.concat([df1, df2], ignore_index=True)\n```\n\n`ignore_index=True` discards the original indexes and renumbers the rows. `DataFrame.append` was removed in pandas 2.0, so don't use it.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `pd.concat`, which stacks along the row axis by default:\n\n```python\nimport pandas as pd\n\ndf1 = pd.DataFrame({\"id\": [1, 2], \"value\": [\"a\", \"b\"]})\ndf2 = pd.DataFrame({\"id\": [3, 4], \"value\": [\"c\", \"d\"]})\n\ncombined = pd.concat([df1, df2], ignore_index=True)\nprint(combined)\n#    id value\n# 0   1     a\n# 1   2     b\n# 2   3     c\n# 3   4     d\n```\n\n`ignore_index=True` rebuilds the row index as 0..n-1. Without it, the original indexes are kept, so duplicates can appear if both frames had their own 0-based index.\n\n`DataFrame.append` was removed in pandas 2.0, so don't use it.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "merge-frames",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, how do I left-join two DataFrames on a shared \"id\" column? Name the function and its key arguments and show it.",
+      "A": {
+        "text": "Use `pd.merge()` (or the equivalent `DataFrame.merge()` method) with `how=\"left\"` and `on=\"id\"`:\n\n```python\nimport pandas as pd\n\nleft = pd.DataFrame({\"id\": [1, 2, 3], \"name\": [\"a\", \"b\", \"c\"]})\nright = pd.DataFrame({\"id\": [2, 3, 4], \"score\": [90, 80, 70]})\n\nresult = pd.merge(left, right, on=\"id\", how=\"left\")\n# equivalently: left.merge(right, on=\"id\", how=\"left\")\n```\n\nKey arguments:\n- `on=\"id\"`: the shared column to join on (use `left_on`/`right_on` if the names differ).\n- `how=\"left\"`: keep every row from the left DataFrame; unmatched rows get `NaN` for right-side columns.\n- `validate=\"many_to_one\"` (optional): raises an error if the right side has duplicate `id` values, which helps catch unexpected row multiplication.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`pandas.merge()`** (or the equivalent **`DataFrame.merge()`** method) with `how=\"left\"` and `on=\"id\"`.\n\n```python\nimport pandas as pd\n\nleft = pd.DataFrame({\"id\": [1, 2, 3], \"name\": [\"a\", \"b\", \"c\"]})\nright = pd.DataFrame({\"id\": [2, 3, 4], \"score\": [90, 85, 70]})\n\nresult = pd.merge(left, right, on=\"id\", how=\"left\")\n# equivalently: left.merge(right, on=\"id\", how=\"left\")\n```\n\nKey arguments:\n\n- `on=\"id\"`: the shared key column. Use `left_on=` and `right_on=` if the names differ.\n- `how=\"left\"`: keep every row from the left DataFrame. Unmatched rows get `NaN` for the right-side columns.\n- `validate=\"many_to_one\"` (optional): raises an error if the right side has duplicate `id` values.\n- `indicator=True` (optional): adds a `_merge` column showing whether each row matched.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "groupby-agg",
+      "regime": "core",
+      "category": "DataFrame",
+      "question": "In pandas, how do I group a DataFrame by \"region\" and sum \"sales\" per group? Name the methods and show the snippet.",
+      "A": {
+        "text": "Use `DataFrame.groupby()` with `SeriesGroupBy.sum()` (or `DataFrame.groupby(...)[...].sum()`):\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\", \"South\"],\n    \"sales\":  [100, 200, 150, 300, 250],\n})\n\nresult = df.groupby(\"region\")[\"sales\"].sum()\nprint(result)\n```\n\nOutput:\n```\nregion\nEast     300\nNorth    250\nSouth    450\nName: sales, dtype: int64\n```\n\n`groupby(\"region\")` splits the rows by region, `[\"sales\"]` selects the column, and `.sum()` aggregates each group. Add `.reset_index()` if you want `region` back as a regular column rather than the index.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `groupby` and then `sum` on the `sales` column:\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\", \"South\"],\n    \"sales\":  [100, 200, 150, 50, 300],\n})\n\nresult = df.groupby(\"region\")[\"sales\"].sum()\nprint(result)\n# region\n# East      50\n# North    250\n# South    500\n# Name: sales, dtype: int64\n```\n\nFor a DataFrame with `region` as a regular column instead of the index, add `as_index=False`:\n\n```python\nresult = df.groupby(\"region\", as_index=False)[\"sales\"].sum()\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "pivot-table",
+      "regime": "core",
+      "category": "DataFrame",
+      "question": "In pandas, how do I build a pivot table: mean of \"value\" with \"a\" as rows and \"b\" as columns? Name the method and show it.",
+      "A": {
+        "text": "Use `DataFrame.pivot_table` with `index`, `columns`, `values`, and `aggfunc`:\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"a\": [\"x\", \"x\", \"y\", \"y\"],\n    \"b\": [\"p\", \"q\", \"p\", \"q\"],\n    \"value\": [1, 2, 3, 4],\n})\n\ntable = df.pivot_table(index=\"a\", columns=\"b\", values=\"value\", aggfunc=\"mean\")\nprint(table)\n```\n\n`aggfunc=\"mean\"` is also the default, so `values=\"value\"` with `index=\"a\", columns=\"b\"` gives the same result. `pivot_table` aggregates duplicate (a, b) pairs, which is what distinguishes it from `DataFrame.pivot`, which requires unique pairs.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`DataFrame.pivot_table`**. Set `index=\"a\"` for rows, `columns=\"b\"` for columns, `values=\"value\"`, and `aggfunc=\"mean\"` (which is also the default).\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\n    \"a\": [\"x\", \"x\", \"y\", \"y\", \"x\"],\n    \"b\": [\"p\", \"q\", \"p\", \"q\", \"p\"],\n    \"value\": [1.0, 2.0, 3.0, 4.0, 5.0],\n})\n\npt = df.pivot_table(index=\"a\", columns=\"b\", values=\"value\", aggfunc=\"mean\")\nprint(pt)\n```\n\nThe result has `a` values as the row index and `b` values as the columns, with the mean of `value` in each cell. Cells with no matching rows are `NaN`.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "value-counts-series",
+      "regime": "core",
+      "category": "Series",
+      "question": "In pandas, given a Series, how do I get the count of each distinct value and, separately, the array of unique values? Name the methods and show them.",
+      "A": {
+        "text": "Use `value_counts()` for the counts and `unique()` for the distinct values.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"a\", \"b\", \"a\", \"c\", \"a\", \"b\"])\n\ncounts = s.value_counts()   # Series: value -> count, sorted by count descending\nuniques = s.unique()        # numpy array of distinct values, in order of appearance\n\nprint(counts)\n# a    3\n# b    2\n# c    1\n# Name: count, dtype: int64\n\nprint(uniques)\n# ['a' 'b' 'c']\n```\n\nNotes:\n- `value_counts()` drops NaN by default; pass `dropna=False` to include it.\n- `unique()` keeps NaN as a value; `nunique()` gives just the number of distinct values.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`Series.value_counts()`** for the counts and **`Series.unique()`** for the distinct values.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"a\", \"b\", \"a\", \"c\", \"a\", \"b\"])\n\ns.value_counts()   # Series: value -> count, sorted by count (descending)\n# a    3\n# b    2\n# c    1\n# Name: count, dtype: int64\n\ns.unique()         # ndarray of distinct values, in order of first appearance\n# array(['a', 'b', 'c'], dtype=object)\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "series-items",
+      "regime": "core",
+      "category": "Series",
+      "question": "In pandas, how do I iterate over the (index, value) pairs of a Series in a current pandas version? Name the method and show the loop.",
+      "A": {
+        "text": "The method is `Series.items()`, which yields `(index, value)` tuples lazily.\n\n```python\nimport pandas as pd\n\ns = pd.Series([10, 20, 30], index=[\"a\", \"b\", \"c\"])\n\nfor idx, val in s.items():\n    print(idx, val)\n```\n\nOutput:\n```\na 10\nb 20\nc 30\n```\n\nNote that `Series.iteritems()` was removed in pandas 2.0, so use `items()` instead.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `Series.items()`, which lazily yields `(index, value)` tuples:\n\n```python\nimport pandas as pd\n\ns = pd.Series([10, 20, 30], index=[\"a\", \"b\", \"c\"])\n\nfor idx, val in s.items():\n    print(idx, val)\n# a 10\n# b 20\n# c 30\n```\n\n`Series.iteritems()` was removed in pandas 2.0, so use `items()` instead.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "str-contains-extract",
+      "regime": "core",
+      "category": "Series.str",
+      "question": "In pandas, on a string Series, how do I keep rows whose text contains \"error\" (regex), and separately extract a regex capture group? Name the string methods and show them.",
+      "A": {
+        "text": "Use `Series.str.contains` to filter rows and `Series.str.extract` to pull out a capture group.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"disk error 42\", \"all good\", \"ERROR: code 7\", None])\n\n# 1) Keep rows matching the regex (case-insensitive; na=False treats missing values as non-matches)\nmask = s.str.contains(r\"error\", case=False, regex=True, na=False)\nerrors = s[mask]\n\n# 2) Extract a capture group\ncodes = s.str.extract(r\"code (\\d+)\", expand=False)  # Series; NaN where no match\n```\n\n- `contains` returns a boolean mask, so `s[mask]` keeps the matching rows.\n- `extract` returns the first capture group. With `expand=False` and one group you get a Series. Use a named group such as `(?P<code>\\d+)` if you want a labeled column when you have several groups.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `str.contains` for the filter and `str.extract` for the capture group.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"disk error 42\", \"all good\", \"Error: timeout 7\", None])\n\n# 1. Keep rows whose text matches the regex \"error\" (case-insensitive)\nmask = s.str.contains(\"error\", case=False, regex=True, na=False)\nkept = s[mask]\n# 0    disk error 42\n# 2    Error: timeout 7\n\n# 2. Extract a capture group. expand=False returns a Series instead of a DataFrame.\ncodes = s.str.extract(r\"(\\d+)\", expand=False)\n# 0      42\n# 1     NaN\n# 2       7\n# 3     NaN\n```\n\n- `str.contains(..., regex=True, na=False)` gives a boolean mask. `na=False` keeps missing values from producing NaN in the mask.\n- `str.extract(pat, expand=False)` returns the first capture group as a Series. With named groups, such as `(?P<code>\\d+)`, and without `expand=False`, it returns a DataFrame with one column per group.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "elementwise-map",
+      "regime": "deep",
+      "category": "DataFrame",
+      "question": "In a current pandas (3.x), how do I apply a Python function elementwise to every cell of a whole DataFrame? Name the exact method and show it.",
+      "A": {
+        "text": "Use `DataFrame.map()`. It applies a function to every cell. (`DataFrame.applymap()` was deprecated in pandas 2.1 and removed in 3.x, so don't use it.)\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1, 2], \"b\": [3, 4]})\n\nout = df.map(lambda x: x * 10)\n#     a   b\n# 0  10  30\n# 1  20  40\n```\n\nExtra positional or keyword arguments go through `args` and `**kwargs`, for example `df.map(round, ndigits=1)`.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`DataFrame.map`**. It applies a function to each element. In pandas 3.x, `DataFrame.applymap` has been removed, so use `map` instead.\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1, 2], \"b\": [3, 4]})\n\ndf_squared = df.map(lambda x: x ** 2)\n#    a   b\n# 0  1   9\n# 1  4  16\n```\n\nExtra positional or keyword arguments are forwarded to the function: `df.map(func, arg=...)`.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "transpose-swap",
+      "regime": "deep",
+      "category": "DataFrame",
+      "question": "In a current pandas (3.x), how do I swap the rows and columns (transpose) of a DataFrame? Name the current attribute or method and show it.",
+      "A": {
+        "text": "Use the `.T` attribute (equivalent to `DataFrame.transpose()`):\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1, 2], \"b\": [3, 4]}, index=[\"x\", \"y\"])\n\nprint(df.T)\n#    x  y\n# a  1  2\n# b  3  4\n\n# Method form, same result\ndf.transpose()\n```\n\nBoth return a new DataFrame; the original is unchanged. Note that if the columns have mixed dtypes, the transposed frame gets a common dtype (often `object`), so check `dtypes` afterward.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use the `.T` attribute or the `transpose()` method. Both return a new DataFrame with index and columns swapped.\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({\"a\": [1, 2], \"b\": [3, 4]}, index=[\"x\", \"y\"])\n\ndf.T                 # attribute\ndf.transpose()       # method, same result\n```\n\n```\n   x  y\na  1  2\nb  3  4\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "index-is-integer",
+      "regime": "deep",
+      "category": "pandas.api.types",
+      "question": "In a current pandas (3.x), how do I check whether a Series or Index holds integer values? The Index.is_integer method was removed -- name the current function in the API-types namespace and show it.",
+      "A": {
+        "text": "Use `pandas.api.types.is_integer_dtype`. It checks the dtype, so it works on both Series and Index:\n\n```python\nimport pandas as pd\nfrom pandas.api.types import is_integer_dtype\n\ns = pd.Series([1, 2, 3])\nidx = pd.Index([\"a\", \"b\"])\n\nis_integer_dtype(s)    # True\nis_integer_dtype(idx)  # False\nis_integer_dtype(pd.Index([1, 2], dtype=\"uint8\"))  # True (signed and unsigned both count)\n```\n\nNote that it checks the dtype, not the values. An object-dtype Series holding Python ints returns `False`. If you need to inspect the values, use `pd.api.types.infer_dtype(s)`, which returns `\"integer\"` for that case.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `pandas.api.types.is_integer_dtype`. It accepts a Series, an Index, or a dtype:\n\n```python\nimport pandas as pd\nfrom pandas.api.types import is_integer_dtype\n\ns = pd.Series([1, 2, 3])\nidx = pd.Index([\"a\", \"b\"])\n\nis_integer_dtype(s)        # True\nis_integer_dtype(idx)      # False\nis_integer_dtype(s.dtype)  # True\n```\n\n`is_integer` checks a single scalar object, not a Series or Index, so it isn't the replacement here.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "str-pad-zeros",
+      "regime": "deep",
+      "category": "Series.str",
+      "question": "In pandas, on a string Series, how do I left-pad values with zeros to width 6, and separately uppercase them? Name the string methods and show them.",
+      "A": {
+        "text": "Use the `.str` accessor: `str.zfill(6)` left-pads with zeros to a width of 6, and `str.upper()` uppercases.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"42\", \"7\", \"123456\", \"ab1\"])\n\npadded = s.str.zfill(6)    # '000042', '000007', '123456', '00ab1'\nupper  = s.str.upper()     # '42', '7', '123456', 'AB1'\n```\n\nTo do both, chain them. Order doesn't matter here, since zero-padding doesn't change letter case:\n\n```python\nresult = s.str.zfill(6).str.upper()\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `Series.str.zfill(6)` for zero-padding and `Series.str.upper()` for uppercasing.\n\n```python\nimport pandas as pd\n\ns = pd.Series([\"42\", \"7\", \"abc\"])\n\ns.str.zfill(6)   # '000042', '000007', '000abc'\ns.str.upper()    # '42', '7', 'ABC'\n```\n\n`zfill` pads on the left with `'0'`. If a value starts with a sign, such as `'-42'`, the zeros go after the sign (`'-00042'`). If you want a different pad character, use `s.str.rjust(6, fillchar=\"0\")`.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "dt-accessor",
+      "regime": "deep",
+      "category": "Series.dt (datetime)",
+      "question": "In pandas, from a datetime Series, how do I get the year and the day-of-week as separate Series via the dt accessor? Name the dt attributes and show them.",
+      "A": {
+        "text": "Use the `.dt` accessor: `.dt.year` gives the year and `.dt.dayofweek` gives the day of week (Monday=0 through Sunday=6). Both return Series aligned to the original index.\n\n```python\nimport pandas as pd\n\ns = pd.Series(pd.to_datetime([\"2024-03-15\", \"2025-07-04\", \"2023-12-31\"]))\n\nyears = s.dt.year        # 2024, 2025, 2023\ndow = s.dt.dayofweek     # 4, 4, 6  (Monday=0 ... Sunday=6)\n\nprint(years)\nprint(dow)\n```\n\nIf you want day names instead of numbers, use `s.dt.day_name()`. The `.dt.weekday` attribute is an alias for `.dt.dayofweek`.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use the `dt.year` and `dt.day_of_week` attributes:\n\n```python\nimport pandas as pd\n\ns = pd.Series(pd.to_datetime([\"2024-03-15\", \"2025-07-04\", \"2023-12-31\"]))\n\nyears = s.dt.year          # int Series: 2024, 2025, 2023\ndows = s.dt.day_of_week    # int Series with Monday=0 ... Sunday=6\n\nprint(pd.DataFrame({\"year\": years, \"day_of_week\": dows}))\n```\n\n`dt.day_of_week` returns integers, so 2024-03-15 (a Friday) gives `4`.",
+        "stop_reason": "end_turn"
+      }
+    }
+  ]
+}

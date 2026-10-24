@@ -1,0 +1,188 @@
+{
+  "model": "claude-haiku-4-5",
+  "provider": "anthropic",
+  "records": [
+    {
+      "id": "read-csv-usecols",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, how do I read a CSV file and keep only two columns by name while reading? Name the function and the argument and show a short snippet.",
+      "A": {
+        "text": "Use `pd.read_csv()` with the `usecols` argument:\n\n```python\nimport pandas as pd\n\ndf = pd.read_csv('file.csv', usecols=['col1', 'col2'])\n```\n\nThis reads the CSV and keeps only the specified columns, which is more efficient than reading all columns and dropping them afterward.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`pd.read_csv()`** with the **`usecols`** argument:\n\n```python\nimport pandas as pd\n\ndf = pd.read_csv('file.csv', usecols=['col1', 'col2'])\n```\n\nThe `usecols` parameter accepts a list of column names to keep, reading only those columns from the CSV file.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "concat-frames",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, I have two DataFrames with the same columns and want to stack them into one. What is the current, recommended way? Name the function and show it.",
+      "A": {
+        "text": "Use `pd.concat()`:\n\n```python\nresult = pd.concat([df1, df2], ignore_index=True)\n```\n\nThe `ignore_index=True` parameter resets the row indices. Omit it if you want to keep the original indices.\n\nFor multiple DataFrames, just pass them all in the list:\n\n```python\nresult = pd.concat([df1, df2, df3], ignore_index=True)\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`pd.concat()`**:\n\n```python\nimport pandas as pd\n\ndf1 = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})\ndf2 = pd.DataFrame({'A': [5, 6], 'B': [7, 8]})\n\nresult = pd.concat([df1, df2], ignore_index=True)\n```\n\nThis stacks `df1` and `df2` vertically (rows), with `ignore_index=True` to reset the row index.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "merge-frames",
+      "regime": "core",
+      "category": "pandas",
+      "question": "In pandas, how do I left-join two DataFrames on a shared \"id\" column? Name the function and its key arguments and show it.",
+      "A": {
+        "text": "Use `pd.merge()` with `how='left'`:\n\n```python\nresult = pd.merge(df1, df2, on='id', how='left')\n```\n\nKey arguments:\n- `on`: the column name to join on\n- `how`: `'left'` keeps all rows from `df1`\n\nIf the id columns have different names, use `left_on` and `right_on` instead:\n\n```python\nresult = pd.merge(df1, df2, left_on='id1', right_on='id2', how='left')\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `pd.merge()` with `how='left'`:\n\n```python\nresult = pd.merge(df1, df2, on='id', how='left')\n```\n\n**Key arguments:**\n- `on='id'` — the shared column name\n- `how='left'` — left join (keeps all rows from df1)\n\nIf the id columns have different names, use `left_on='id1', right_on='id2'` instead.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "groupby-agg",
+      "regime": "core",
+      "category": "DataFrame",
+      "question": "In pandas, how do I group a DataFrame by \"region\" and sum \"sales\" per group? Name the methods and show the snippet.",
+      "A": {
+        "text": "Use `groupby()` and `sum()`:\n\n```python\ndf.groupby('region')['sales'].sum()\n```\n\nOr to keep it as a DataFrame:\n\n```python\ndf.groupby('region')[['sales']].sum()\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`groupby()`** and **`sum()`**:\n\n```python\ndf.groupby(\"region\")[\"sales\"].sum()\n```\n\nThis groups the DataFrame by the \"region\" column and sums the \"sales\" column for each group, returning a Series with region as the index.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "pivot-table",
+      "regime": "core",
+      "category": "DataFrame",
+      "question": "In pandas, how do I build a pivot table: mean of \"value\" with \"a\" as rows and \"b\" as columns? Name the method and show it.",
+      "A": {
+        "text": "Use `pivot_table()`:\n\n```python\ndf.pivot_table(values='value', index='a', columns='b', aggfunc='mean')\n```\n\nThis groups by \"a\" (rows) and \"b\" (columns), computing the mean of \"value\" for each combination.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`pivot_table`**:\n\n```python\ndf.pivot_table(values='value', index='a', columns='b', aggfunc='mean')\n```\n\nThis creates a pivot table with 'a' as rows, 'b' as columns, and computes the mean of 'value' for each combination.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "value-counts-series",
+      "regime": "core",
+      "category": "Series",
+      "question": "In pandas, given a Series, how do I get the count of each distinct value and, separately, the array of unique values? Name the methods and show them.",
+      "A": {
+        "text": "Use `value_counts()` for counts and `unique()` for the array:\n\n```python\ns = pd.Series(['a', 'b', 'a', 'c', 'b', 'a'])\n\n# Count of each distinct value\ncounts = s.value_counts()\n# a    3\n# b    2\n# c    1\n\n# Array of unique values\nuniques = s.unique()\n# array(['a', 'b', 'c'], dtype=object)\n```\n\n`value_counts()` returns a Series with counts sorted descending by default. `unique()` returns a numpy array in order of first appearance.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use these two methods:\n\n1. **`value_counts()`** — Returns a Series with counts of each distinct value\n2. **`unique()`** — Returns a numpy array of unique values\n\n```python\nimport pandas as pd\n\ns = pd.Series(['a', 'b', 'a', 'c', 'b', 'a'])\n\n# Count of each distinct value\ncounts = s.value_counts()\n# b    2\n# a    3\n# c    1\n\n# Array of unique values\nuniques = s.unique()\n# array(['a', 'b', 'c'], dtype=object)\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "series-items",
+      "regime": "core",
+      "category": "Series",
+      "question": "In pandas, how do I iterate over the (index, value) pairs of a Series in a current pandas version? Name the method and show the loop.",
+      "A": {
+        "text": "Use `.items()`:\n\n```python\nimport pandas as pd\n\ns = pd.Series([10, 20, 30], index=['a', 'b', 'c'])\n\nfor idx, val in s.items():\n    print(idx, val)\n```\n\nOutput:\n```\na 10\nb 20\nc 30\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use the **`items()`** method to iterate over (index, value) pairs:\n\n```python\ns = pd.Series([10, 20, 30], index=['a', 'b', 'c'])\n\nfor idx, val in s.items():\n    print(idx, val)\n```\n\nOutput:\n```\na 10\nb 20\nc 30\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "str-contains-extract",
+      "regime": "core",
+      "category": "Series.str",
+      "question": "In pandas, on a string Series, how do I keep rows whose text contains \"error\" (regex), and separately extract a regex capture group? Name the string methods and show them.",
+      "A": {
+        "text": "# Filter rows containing \"error\"\n```python\ndf[df['col'].str.contains('error', regex=True)]\n```\n\n# Extract a capture group\n```python\ndf['col'].str.extract(r'(capture_group_pattern)')\n```\n\nThe methods are **`str.contains()`** and **`str.extract()`**.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "# Filter and extract from string Series\n\n**Filter rows containing \"error\":**\n```python\ns[s.str.contains(\"error\", regex=True)]\n```\n\n**Extract a regex capture group:**\n```python\ns.str.extract(r\"(your_group_pattern)\")\n```\n\nThe methods are:\n- `str.contains()` — filter rows matching the pattern\n- `str.extract()` — extract capture groups into columns",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "elementwise-map",
+      "regime": "deep",
+      "category": "DataFrame",
+      "question": "In a current pandas (3.x), how do I apply a Python function elementwise to every cell of a whole DataFrame? Name the exact method and show it.",
+      "A": {
+        "text": "Use **`applymap()`**:\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})\nresult = df.applymap(lambda x: x * 2)\n```\n\nThis applies the function to every element in the DataFrame. In pandas 3.x, `applymap()` is the standard method for element-wise operations across the entire DataFrame.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`DataFrame.map()`** to apply a Python function elementwise to every cell:\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})\n\nresult = df.map(lambda x: x * 2)\n```\n\nThis applies the function to every element in the entire DataFrame and returns a new DataFrame with the same shape.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "transpose-swap",
+      "regime": "deep",
+      "category": "DataFrame",
+      "question": "In a current pandas (3.x), how do I swap the rows and columns (transpose) of a DataFrame? Name the current attribute or method and show it.",
+      "A": {
+        "text": "Use the `.T` attribute:\n\n```python\ndf.T\n```\n\nOr equivalently, the `.transpose()` method:\n\n```python\ndf.transpose()\n```\n\nBoth swap rows and columns. `.T` is the most common shorthand.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use the `.T` attribute or `.transpose()` method to swap rows and columns:\n\n```python\nimport pandas as pd\n\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})\n\n# Using .T attribute\ndf_transposed = df.T\n\n# Or using .transpose() method\ndf_transposed = df.transpose()\n```\n\nBoth produce the same result. The `.T` attribute is the most concise and commonly used.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "index-is-integer",
+      "regime": "deep",
+      "category": "pandas.api.types",
+      "question": "In a current pandas (3.x), how do I check whether a Series or Index holds integer values? The Index.is_integer method was removed -- name the current function in the API-types namespace and show it.",
+      "A": {
+        "text": "Use `api.types.is_integer_dtype()`:\n\n```python\nimport pandas as pd\nfrom pandas.api.types import is_integer_dtype\n\ns = pd.Series([1, 2, 3])\nprint(is_integer_dtype(s))  # True\n\nidx = pd.Index([1, 2, 3])\nprint(is_integer_dtype(idx))  # True\n```\n\nThis checks if the dtype is any integer type (int8, int16, int32, int64, uint8, etc.).",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `pandas.api.types.is_integer_dtype`:\n\n```python\nimport pandas as pd\nfrom pandas.api.types import is_integer_dtype\n\ns = pd.Series([1, 2, 3])\nidx = pd.Index([1, 2, 3])\n\nprint(is_integer_dtype(s))   # True\nprint(is_integer_dtype(idx))  # True\n```\n\nThis checks whether a Series or Index has an integer dtype.",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "str-pad-zeros",
+      "regime": "deep",
+      "category": "Series.str",
+      "question": "In pandas, on a string Series, how do I left-pad values with zeros to width 6, and separately uppercase them? Name the string methods and show them.",
+      "A": {
+        "text": "Use `.str.zfill()` to left-pad with zeros and `.str.upper()` to uppercase:\n\n```python\ns = pd.Series(['foo', '42', 'x'])\n\ns.str.zfill(6)\n# 0   000foo\n# 1   000042\n# 2   00000x\n\ns.str.upper()\n# 0     FOO\n# 1      42\n# 2       X\n```\n\nChain them together if you need both:\n\n```python\ns.str.zfill(6).str.upper()\n# 0   000FOO\n# 1   000042\n# 2   00000X\n```",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use **`str.zfill()`** to left-pad with zeros and **`str.upper()`** to uppercase:\n\n```python\ns = pd.Series(['abc', '12', 'x'])\n\n# Left-pad with zeros to width 6\ns.str.zfill(6)\n# 0    00abc\n# 1    000012\n# 2    00000x\n\n# Uppercase\ns.str.upper()\n# 0    ABC\n# 1     12\n# 2      X\n\n# Both together\ns.str.zfill(6).str.upper()\n# 0    00ABC\n# 1    000012\n# 2    00000X\n```",
+        "stop_reason": "end_turn"
+      }
+    },
+    {
+      "id": "dt-accessor",
+      "regime": "deep",
+      "category": "Series.dt (datetime)",
+      "question": "In pandas, from a datetime Series, how do I get the year and the day-of-week as separate Series via the dt accessor? Name the dt attributes and show them.",
+      "A": {
+        "text": "Use the `.dt` accessor with `.year` and `.day_name()` (or `.dayofweek` for numeric):\n\n```python\nimport pandas as pd\n\ns = pd.Series(pd.date_range('2024-01-01', periods=5))\n\nyear = s.dt.year\nday_of_week = s.dt.day_name()  # returns 'Monday', 'Tuesday', etc.\n# OR\nday_of_week_num = s.dt.dayofweek  # returns 0-6 (Monday=0)\n```\n\nThe `.dt.year` returns a numeric Series, while `.dt.day_name()` returns string day names. Use `.dt.dayofweek` if you need the numeric day index.",
+        "stop_reason": "end_turn"
+      },
+      "B": {
+        "text": "Use `.dt.year` and `.dt.day_of_week`:\n\n```python\nimport pandas as pd\n\ndates = pd.Series(pd.date_range('2024-01-01', periods=5))\n\nyear = dates.dt.year\nday_of_week = dates.dt.day_of_week\n\nprint(year)\nprint(day_of_week)\n```\n\nOutput:\n```\n0    2024\n1    2024\n2    2024\n3    2024\n4    2024\ndtype: int32\n\n0    0\n1    1\n2    2\n3    3\n4    4\ndtype: int32\n```",
+        "stop_reason": "end_turn"
+      }
+    }
+  ]
+}
